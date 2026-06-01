@@ -1,0 +1,1155 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FS8 MCC System Design Document</title>
+<style>
+  /* === TASA Style: Flat, Professional, Navy/White/Black === */
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: Arial, "微軟正黑體", sans-serif;
+    font-size: 13px;
+    color: #1a1a1a;
+    background: #f0f2f5;
+    line-height: 1.6;
+  }
+
+  /* === Page Header === */
+  .page-header {
+    background: #003366;
+    color: #ffffff;
+    padding: 0;
+  }
+  .header-top {
+    background: #002244;
+    padding: 6px 24px;
+    font-size: 11px;
+    letter-spacing: 1px;
+    color: #99bbdd;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .header-title-bar {
+    padding: 18px 24px 14px 24px;
+    display: flex;
+    align-items: flex-end;
+    gap: 20px;
+  }
+  .header-logo-box {
+    border-right: 2px solid #336699;
+    padding-right: 20px;
+    margin-right: 4px;
+  }
+  .header-logo-box .org {
+    font-size: 11px;
+    color: #99bbdd;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+  .header-logo-box .org-cn {
+    font-size: 16px;
+    font-weight: bold;
+    color: #ffffff;
+    letter-spacing: 4px;
+  }
+  .header-doc-info h1 {
+    font-size: 20px;
+    font-weight: bold;
+    color: #ffffff;
+    line-height: 1.2;
+  }
+  .header-doc-info .subtitle {
+    font-size: 12px;
+    color: #99ccee;
+    margin-top: 4px;
+  }
+  .header-divider {
+    height: 4px;
+    background: linear-gradient(to right, #cc3300 30%, #336699 100%);
+  }
+
+  /* === Nav / Document Meta === */
+  .doc-meta {
+    background: #ffffff;
+    border-bottom: 2px solid #003366;
+    padding: 8px 24px;
+    display: flex;
+    gap: 32px;
+    font-size: 11px;
+    color: #555;
+  }
+  .doc-meta span { white-space: nowrap; }
+  .doc-meta strong { color: #003366; }
+
+  /* === Layout === */
+  .container {
+    max-width: 1100px;
+    margin: 24px auto;
+    padding: 0 16px;
+  }
+
+  /* === Section Card === */
+  .section-card {
+    background: #ffffff;
+    border-top: 4px solid #003366;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  }
+
+  .section-header {
+    background: #003366;
+    color: #ffffff;
+    padding: 10px 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-header .section-num {
+    background: #cc3300;
+    color: #fff;
+    font-size: 11px;
+    font-weight: bold;
+    padding: 2px 8px;
+    min-width: 36px;
+    text-align: center;
+    letter-spacing: 0.5px;
+  }
+  .section-header h2 {
+    font-size: 14px;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+  }
+  .section-header .section-en {
+    font-size: 11px;
+    color: #99ccee;
+    margin-left: auto;
+  }
+
+  .section-body {
+    padding: 16px 20px;
+  }
+
+  /* === Sub-section headers === */
+  .subsection-title {
+    font-size: 13px;
+    font-weight: bold;
+    color: #003366;
+    border-bottom: 1px solid #336699;
+    padding-bottom: 4px;
+    margin: 18px 0 10px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .subsection-title .num {
+    background: #336699;
+    color: #fff;
+    font-size: 10px;
+    padding: 1px 6px;
+  }
+
+  .subsubsection-title {
+    font-size: 12px;
+    font-weight: bold;
+    color: #336699;
+    margin: 14px 0 6px 0;
+    padding-left: 10px;
+    border-left: 3px solid #336699;
+  }
+
+  .detail-title {
+    font-size: 12px;
+    font-weight: bold;
+    color: #555;
+    margin: 10px 0 4px 0;
+    padding-left: 16px;
+    border-left: 2px solid #cc3300;
+  }
+
+  /* === Text blocks === */
+  .body-text {
+    color: #333;
+    margin: 6px 0;
+    line-height: 1.7;
+  }
+  .body-text-indent {
+    color: #333;
+    margin: 6px 0 6px 20px;
+    line-height: 1.7;
+  }
+  .caption {
+    font-size: 11px;
+    color: #666;
+    font-style: italic;
+    margin: 4px 0 10px 0;
+    text-align: center;
+  }
+
+  /* === Bullet lists === */
+  ul.tasa-list {
+    list-style: none;
+    margin: 6px 0 6px 16px;
+    padding: 0;
+  }
+  ul.tasa-list li {
+    padding: 3px 0 3px 18px;
+    position: relative;
+    color: #333;
+    line-height: 1.6;
+  }
+  ul.tasa-list li::before {
+    content: "◆";
+    position: absolute;
+    left: 0;
+    color: #003366;
+    font-size: 8px;
+    top: 6px;
+  }
+  ul.tasa-list.level2 li::before { color: #336699; }
+  ul.tasa-list.level3 li::before { color: #cc3300; font-size: 7px; }
+  ul.tasa-list.level4 li::before { content: "–"; color: #999; top: 3px; font-size: 12px; }
+
+  /* === Architecture blocks === */
+  .arch-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+    margin: 12px 0;
+  }
+  .arch-box {
+    border: 1px solid #336699;
+    background: #f0f4f8;
+    padding: 10px 14px;
+  }
+  .arch-box .arch-title {
+    font-size: 11px;
+    font-weight: bold;
+    color: #003366;
+    border-bottom: 1px solid #99bbdd;
+    padding-bottom: 4px;
+    margin-bottom: 6px;
+  }
+  .arch-box p {
+    font-size: 11px;
+    color: #444;
+    line-height: 1.5;
+  }
+  .arch-box.highlight {
+    background: #003366;
+  }
+  .arch-box.highlight .arch-title,
+  .arch-box.highlight p {
+    color: #ffffff;
+  }
+  .arch-box.highlight { border-color: #cc3300; }
+
+  /* === Interface table === */
+  .iface-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    margin: 10px 0;
+  }
+  .iface-table th {
+    background: #003366;
+    color: #ffffff;
+    padding: 7px 10px;
+    text-align: left;
+    font-weight: bold;
+    font-size: 11px;
+    letter-spacing: 0.3px;
+  }
+  .iface-table td {
+    padding: 6px 10px;
+    border-bottom: 1px solid #dde3ea;
+    vertical-align: top;
+  }
+  .iface-table tr:nth-child(even) td { background: #f5f7fa; }
+  .iface-table tr:hover td { background: #e8eef5; }
+  .iface-table td.code {
+    font-family: "Courier New", monospace;
+    font-size: 11px;
+    color: #336699;
+  }
+
+  /* === Requirement mapping table === */
+  .req-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11px;
+    margin: 10px 0;
+  }
+  .req-table th {
+    background: #336699;
+    color: #fff;
+    padding: 6px 8px;
+    text-align: left;
+  }
+  .req-table td {
+    padding: 5px 8px;
+    border-bottom: 1px solid #dde;
+    vertical-align: top;
+  }
+  .req-table tr:nth-child(even) td { background: #f5f7fa; }
+  .req-table td.req-id {
+    font-family: monospace;
+    color: #cc3300;
+    white-space: nowrap;
+    font-weight: bold;
+  }
+  .req-table td.comply {
+    color: #006600;
+    font-weight: bold;
+    text-align: center;
+  }
+
+  /* === Hardware spec table === */
+  .hw-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    margin: 10px 0;
+  }
+  .hw-table th {
+    background: #003366;
+    color: #fff;
+    padding: 7px 10px;
+    text-align: center;
+  }
+  .hw-table td {
+    padding: 6px 10px;
+    border: 1px solid #ccd;
+    vertical-align: top;
+  }
+  .hw-table tr:first-child td { background: #f0f4f8; font-weight: bold; }
+  .hw-table td:first-child { font-weight: bold; color: #003366; }
+
+  /* === CSC detail boxes === */
+  .csc-block {
+    border: 1px solid #ccd6e0;
+    margin: 14px 0;
+  }
+  .csc-header {
+    background: #336699;
+    color: #fff;
+    padding: 7px 14px;
+    font-size: 12px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .csc-header .csc-tag {
+    background: #cc3300;
+    font-size: 10px;
+    padding: 1px 6px;
+    font-weight: normal;
+  }
+  .csc-body {
+    padding: 12px 16px;
+  }
+
+  .csu-block {
+    border-left: 3px solid #336699;
+    margin: 10px 0 10px 16px;
+    padding: 8px 12px;
+    background: #f8fafc;
+  }
+  .csu-title {
+    font-size: 12px;
+    font-weight: bold;
+    color: #336699;
+    margin-bottom: 6px;
+  }
+
+  /* === IO boxes === */
+  .io-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin: 8px 0;
+  }
+  .io-box {
+    border: 1px solid #ccd;
+    padding: 8px 12px;
+    background: #fafbfc;
+  }
+  .io-box .io-label {
+    font-size: 10px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #003366;
+    border-bottom: 1px solid #ccd;
+    padding-bottom: 4px;
+    margin-bottom: 6px;
+  }
+  .io-box.input .io-label { color: #006633; border-color: #006633; }
+  .io-box.output .io-label { color: #660033; border-color: #660033; }
+
+  /* === Tag badges === */
+  .tag {
+    display: inline-block;
+    font-size: 10px;
+    padding: 1px 6px;
+    margin: 1px;
+    font-weight: bold;
+  }
+  .tag-blue { background: #336699; color: #fff; }
+  .tag-red { background: #cc3300; color: #fff; }
+  .tag-green { background: #006633; color: #fff; }
+  .tag-gray { background: #999; color: #fff; }
+
+  /* === Info highlight box === */
+  .info-box {
+    background: #e8eef5;
+    border-left: 4px solid #003366;
+    padding: 10px 14px;
+    margin: 10px 0;
+    font-size: 12px;
+    color: #333;
+  }
+  .warn-box {
+    background: #fff3e0;
+    border-left: 4px solid #cc6600;
+    padding: 10px 14px;
+    margin: 10px 0;
+    font-size: 12px;
+    color: #333;
+  }
+
+  /* === Divider === */
+  hr.tasa-hr {
+    border: none;
+    border-top: 1px solid #ccd6e0;
+    margin: 12px 0;
+  }
+
+  /* === Footer === */
+  .page-footer {
+    background: #002244;
+    color: #99bbdd;
+    font-size: 10px;
+    padding: 10px 24px;
+    display: flex;
+    justify-content: space-between;
+    margin-top: 32px;
+  }
+
+  /* === TOC === */
+  .toc-card {
+    background: #ffffff;
+    border-top: 4px solid #cc3300;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    padding: 16px 20px;
+  }
+  .toc-title {
+    font-size: 14px;
+    font-weight: bold;
+    color: #003366;
+    border-bottom: 2px solid #003366;
+    padding-bottom: 6px;
+    margin-bottom: 12px;
+  }
+  .toc-item {
+    padding: 3px 0;
+    font-size: 12px;
+  }
+  .toc-item a {
+    color: #003366;
+    text-decoration: none;
+  }
+  .toc-item a:hover { color: #cc3300; text-decoration: underline; }
+  .toc-item.l1 { font-weight: bold; margin-top: 6px; }
+  .toc-item.l2 { padding-left: 20px; }
+  .toc-item.l3 { padding-left: 40px; color: #555; }
+</style>
+</head>
+<body>
+
+<!-- ===== PAGE HEADER ===== -->
+<div class="page-header">
+  <div class="header-top">
+    <span>FORMOSAT-8 衛星任務系統設計文件</span>
+    <span>FS8-NSPO-RPT-0095 &nbsp;|&nbsp; Issue 00 Rev 00 &nbsp;|&nbsp; 2019/12/02</span>
+  </div>
+  <div class="header-title-bar">
+    <div class="header-logo-box">
+      <div class="org">National Space Organization</div>
+      <div class="org-cn">國 家 太 空 中 心</div>
+    </div>
+    <div class="header-doc-info">
+      <h1>FORMOSAT-8 任務控制中心<br>Mission Control Center (MCC)</h1>
+      <div class="subtitle">Satellite Operations and Control — System Design Document &nbsp;·&nbsp; 摘要章節</div>
+    </div>
+  </div>
+  <div class="header-divider"></div>
+</div>
+
+<!-- ===== DOC META ===== -->
+<div class="doc-meta">
+  <span><strong>文件編號</strong> FS8-NSPO-RPT-0095</span>
+  <span><strong>次系統</strong> MCC — Mission Control Center</span>
+  <span><strong>主系統</strong> SOCC (Satellite Operations Control Center)</span>
+  <span><strong>軟體</strong> MPSS (Mission Planning &amp; Scheduling System)</span>
+  <span><strong>適用</strong> Sec 3.3 &amp; Sec 4.3</span>
+</div>
+
+<!-- ===== MAIN CONTAINER ===== -->
+<div class="container">
+
+  <!-- TOC -->
+  <div class="toc-card">
+    <div class="toc-title">目錄 Contents</div>
+    <div class="toc-item l1"><a href="#s1">1. 系統定位與角色</a></div>
+    <div class="toc-item l1"><a href="#s33">3.3 MCC 次系統設計 (Preliminary Design)</a></div>
+    <div class="toc-item l2"><a href="#s331">3.3.1 概述 MCC Overview</a></div>
+    <div class="toc-item l2"><a href="#s332">3.3.2 次系統資料介面 MCC Interfaces</a></div>
+    <div class="toc-item l2"><a href="#s333">3.3.3 次系統架構 MCC Subsystem Architecture</a></div>
+    <div class="toc-item l2"><a href="#s334">3.3.4 次系統設計描述 MCC Subsystem Design</a></div>
+    <div class="toc-item l3"><a href="#s3341">3.3.4.1 硬體環境 Hardware Architecture</a></div>
+    <div class="toc-item l3"><a href="#s3342">3.3.4.2 系統資料流 Data Flow</a></div>
+    <div class="toc-item l3"><a href="#s3343">3.3.4.3 設計描述 Design Description (MPSS)</a></div>
+    <div class="toc-item l3"><a href="#s3344">3.3.4.4 設計限制 Design Constraints</a></div>
+    <div class="toc-item l3"><a href="#s3345">3.3.4.5 操作注意事項 Operational Considerations</a></div>
+    <div class="toc-item l2"><a href="#s335">3.3.5 需求設計參照說明 Requirements Mapping</a></div>
+    <div class="toc-item l1"><a href="#s43">4.3 MCC Detail Design</a></div>
+    <div class="toc-item l2"><a href="#s431">4.3.1 Orbit Event Process CSC</a></div>
+    <div class="toc-item l2"><a href="#s432">4.3.2 Resource Management CSC</a></div>
+    <div class="toc-item l2"><a href="#s433">4.3.3 Scheduling / Rescheduling CSC</a></div>
+    <div class="toc-item l2"><a href="#s434">4.3.4 Product Generation CSC</a></div>
+    <div class="toc-item l2"><a href="#s435">4.3.5 Utilities CSC</a></div>
+  </div>
+
+  <!-- ===== SECTION 1: 系統定位 ===== -->
+  <div class="section-card" id="s1">
+    <div class="section-header">
+      <span class="section-num">1</span>
+      <h2>MCC 系統定位與角色</h2>
+      <span class="section-en">System Context</span>
+    </div>
+    <div class="section-body">
+      <p class="body-text">
+        任務控制中心 (Mission Control Center, MCC) 為福衛八號衛星操控中心 (SOCC) 內的次系統，提供福衛系列衛星任務操作的支援。主要工作為負責規劃衛星活動與管理地面站資源，以及進行衛星酬載儀器的科學實驗，產生沒有衝突的排程結果。並根據排程結果產生每日的指令序列以供衛星操作員上傳至衛星，衛星便會依照絕對時間執行事先安排好的動作。
+      </p>
+      <div class="arch-grid" style="margin-top:14px;">
+        <div class="arch-box highlight">
+          <div class="arch-title">MCC (本系統)</div>
+          <p>任務規劃與排程<br>Mission Planning &amp; Scheduling</p>
+        </div>
+        <div class="arch-box">
+          <div class="arch-title">MOC</div>
+          <p>任務操作中心<br>Mission Operations Center</p>
+        </div>
+        <div class="arch-box">
+          <div class="arch-title">FDF</div>
+          <p>飛行動態設施<br>Flight Dynamics Facility</p>
+        </div>
+        <div class="arch-box">
+          <div class="arch-title">SCC</div>
+          <p>科學控制中心<br>Science Control Center</p>
+        </div>
+        <div class="arch-box">
+          <div class="arch-title">GCN</div>
+          <p>地面通訊網路<br>Ground Comm. Network</p>
+        </div>
+      </div>
+      <p class="body-text" style="margin-top:10px;">
+        MCC 可將空中及地面作一併考量，進行衛星及地面資源及限制的統合，依照酬載儀器的任務目標，將有限的資源作有效運用，並產生無衝突且具最佳化排程的衛星與酬載指令集，此指令集傳送到 MOC 進行上傳，衛星將依據指令的時序執行各項規劃活動，達成任務目標。
+      </p>
+    </div>
+  </div>
+
+  <!-- ===== SECTION 3.3 ===== -->
+  <div class="section-card" id="s33">
+    <div class="section-header">
+      <span class="section-num">3.3</span>
+      <h2>MCC 次系統設計 (Preliminary Design)</h2>
+      <span class="section-en">MCC Subsystem Design</span>
+    </div>
+    <div class="section-body">
+
+      <!-- 3.3.1 Overview -->
+      <div class="subsection-title" id="s331">
+        <span class="num">3.3.1</span> 概述 MCC Overview
+      </div>
+      <p class="body-text">
+        任務控制中心 (Mission Control Center) 為 SOCC 內的次系統，提供福衛系列衛星任務操作的支援，主要工作為負責規劃衛星活動與管理地面站資源以及進行衛星酬載儀器的科學實驗，產生沒有衝突的排程結果。並根據排程結果產生每日的指令序列以供衛星操作員上傳至衛星，如此一來衛星便會依照絕對時間執行事先安排好的動作。
+      </p>
+
+      <hr class="tasa-hr">
+
+      <!-- 3.3.2 Interfaces -->
+      <div class="subsection-title" id="s332">
+        <span class="num">3.3.2</span> 次系統資料介面 MCC Interfaces
+      </div>
+      <p class="body-text">MCC 次系統與其他次系統介面如下表所示，包含 SOCC 內部的 MOC、FDF 與外部的 IPS-PSS、RTS、TT&amp;C、科學酬載 (Science Payload) 等。</p>
+      <table class="iface-table">
+        <tr>
+          <th>介面對象</th>
+          <th>系統</th>
+          <th>類型</th>
+          <th>說明</th>
+        </tr>
+        <tr>
+          <td>MOC</td>
+          <td>Mission Operations Center</td>
+          <td><span class="tag tag-blue">內部</span></td>
+          <td>接收衛星追蹤資料；傳送指令佇列 (TTQ/MPQ/GEO)</td>
+        </tr>
+        <tr>
+          <td>FDF</td>
+          <td>Flight Dynamics Facility</td>
+          <td><span class="tag tag-blue">內部</span></td>
+          <td>接收軌道事件 (Rev Report, Contact Report)</td>
+        </tr>
+        <tr>
+          <td>SCC</td>
+          <td>Science Control Center</td>
+          <td><span class="tag tag-blue">內部</span></td>
+          <td>接收科學酬載排程請求；提供整合後排程結果</td>
+        </tr>
+        <tr>
+          <td>IPS-PSS</td>
+          <td>Image Processing System</td>
+          <td><span class="tag tag-green">外部</span></td>
+          <td>接收 RSI Mission Timeline</td>
+        </tr>
+        <tr>
+          <td>RTS</td>
+          <td>Remote Tracking Station</td>
+          <td><span class="tag tag-green">外部</span></td>
+          <td>海外地面站排程請求/確認 (FS8-ICD-0003)</td>
+        </tr>
+        <tr>
+          <td>TT&amp;C</td>
+          <td>Tracking, Telemetry &amp; Command</td>
+          <td><span class="tag tag-green">外部</span></td>
+          <td>衛星指令上傳站群通訊</td>
+        </tr>
+      </table>
+      <p class="caption">表 3.3.2：MCC 系統介面概覽（對應圖 3.3.2-1 MCC 系統介面圖）</p>
+
+      <hr class="tasa-hr">
+
+      <!-- 3.3.3 Architecture -->
+      <div class="subsection-title" id="s333">
+        <span class="num">3.3.3</span> 次系統架構 MCC Subsystem Architecture
+      </div>
+      <p class="body-text">MCC 系統架構主要包含五項主要功能 CSC（Computer Software Component），每個 CSC 再由許多 CSU 所組成：</p>
+      <div class="arch-grid">
+        <div class="arch-box">
+          <div class="arch-title">① 軌道事件處理 CSC<br><small>Orbit Event Process</small></div>
+          <p>處理從 FDF 取得的軌道事件資料，存入資料庫供排程規劃使用。</p>
+        </div>
+        <div class="arch-box">
+          <div class="arch-title">② 資源管理 CSC<br><small>Resource Management</small></div>
+          <p>提供管理地面站與衛星資源功能，以利於進行預先規劃。</p>
+        </div>
+        <div class="arch-box">
+          <div class="arch-title">③ 排程事件規劃 CSC<br><small>Scheduling / Rescheduling</small></div>
+          <p>提供 Gantt Chart 等輔助工具，進行酬載任務排程。</p>
+        </div>
+        <div class="arch-box">
+          <div class="arch-title">④ 衛星指令集產生 CSC<br><small>Product Generation</small></div>
+          <p>根據規劃的事件與指令資料庫產生衛星指令集與指令時間序列報告。</p>
+        </div>
+        <div class="arch-box">
+          <div class="arch-title">⑤ 輔助工具 CSC<br><small>Utilities</small></div>
+          <p>提供指令與排程報告傳遞功能，資料清除與資料庫管理。</p>
+        </div>
+      </div>
+      <p class="caption">圖 3.3.3-1：MCC 次系統設計架構圖（5 大 CSC 架構）</p>
+
+      <hr class="tasa-hr">
+
+      <!-- 3.3.4 Design Description -->
+      <div class="subsection-title" id="s334">
+        <span class="num">3.3.4</span> 次系統設計描述 MCC Subsystem Design
+      </div>
+      <p class="body-text">
+        任務排程規劃系統 (Mission Planning and Scheduling System, <strong>MPSS</strong>) 為衛星操控中心任務控制小組所使用的排程軟體，主要負責規劃衛星所使用的地面站資源，並依需求進行衛星任務活動的排程作業，以產生適當的衛星指令。該系統以內建的排程演算法進行各項資源的最有效運用，同時積極避免資源衝突的發生。
+      </p>
+      <div class="info-box">
+        操控組自主發展的排程系統已實際應用於<strong>福衛五號及福衛七號</strong>的任務操作，福衛八號將以福衛五號排程系統為基礎，結合多年操作經驗進行優化與調整，並針對 Video mode 取像、衛星轉動下載、GEO Command 封裝、信息傳遞等新功能進行客製化建置。
+      </div>
+
+      <!-- 3.3.4.1 Hardware -->
+      <div class="subsubsection-title" id="s3341">3.3.4.1 系統操作硬體環境 Hardware Architecture</div>
+      <p class="body-text">為確保 MPSS 系統可持續運行，建議建立兩套排程系統 (Primary/Backup) 互為備援，每天系統會自動同步資料，讓資料庫內的資料都能保持最新狀態。</p>
+      <table class="hw-table">
+        <tr>
+          <th>設備</th>
+          <th>數量</th>
+          <th>功能</th>
+          <th>規格</th>
+        </tr>
+        <tr>
+          <td>一般型電腦 (含螢幕)</td>
+          <td style="text-align:center;">3</td>
+          <td>MPSS 操作主機</td>
+          <td>
+            CPU: Core i7-9700 以上<br>
+            RAM: 可擴充 64GB 以上<br>
+            Storage: 256G SSD + 2TB HDD 以上<br>
+            OS: Windows 7 以上<br>
+            螢幕: 27 吋以上
+          </td>
+        </tr>
+      </table>
+      <p class="caption">表 3.3.4.1：MCC 硬體規格（對應圖 3.3.4.1-1 MCC 硬體架構）</p>
+
+      <!-- 3.3.4.2 Data Flow -->
+      <div class="subsubsection-title" id="s3342">3.3.4.2 系統資料流 Data Flow</div>
+      <p class="body-text">MCC 次系統對於 MOC、FDF、SCC 等次系統之相關介面流程請參考 MCC 資料流相關屬性表。資料流分為 Receiving 與 Sending 兩個方向（表 3.3.4.2-1 / 2）。</p>
+      <div class="io-row">
+        <div class="io-box input">
+          <div class="io-label">Receiving (Input)</div>
+          <ul class="tasa-list level2">
+            <li>軌道事件資料 — FDF (Rev Report, Contact Report)</li>
+            <li>RSI Mission Timeline — IPS-PSS</li>
+            <li>Science Payload Mission Timeline — SCC</li>
+            <li>海外地面站排程確認 — RTS</li>
+          </ul>
+        </div>
+        <div class="io-box output">
+          <div class="io-label">Sending (Output)</div>
+          <ul class="tasa-list level2">
+            <li>衛星指令佇列 (TTQ / MPQ / GEO) — MOC</li>
+            <li>Pass Plan / ASR — 各相關次系統</li>
+            <li>海外地面站排程請求 — RTS</li>
+            <li>排程結果報告 — 供操作人員參考</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- 3.3.4.3 Design Description MPSS -->
+      <div class="subsubsection-title" id="s3343">3.3.4.3 設計描述 Design Description — MPSS</div>
+      <p class="body-text">
+        MPSS 採用<strong>三層式 (3-Tiered) 架構</strong>的應用程式：
+      </p>
+      <div class="arch-grid">
+        <div class="arch-box">
+          <div class="arch-title">終端機層 (Client)</div>
+          <p>使用者介面以 <strong>HTML + JavaScript</strong> 撰寫，使用者可用一般瀏覽器即可進行操作，不侷限於 SOCC 內。</p>
+        </div>
+        <div class="arch-box">
+          <div class="arch-title">應用伺服器層 (App Server)</div>
+          <p>採用 <strong>Java</strong> 程式發展，跨平台語言，採用通用交換格式 <strong>XML</strong>。</p>
+        </div>
+        <div class="arch-box">
+          <div class="arch-title">資料庫層 (Database)</div>
+          <p>採用 Open Source <strong>PostgreSQL</strong>，整體執行環境為 <strong>Windows</strong> 平台。</p>
+        </div>
+      </div>
+      <p class="body-text" style="margin-top:10px;">MPSS 包含四大主要功能：</p>
+      <table class="iface-table">
+        <tr>
+          <th>#</th>
+          <th>功能模組</th>
+          <th>說明</th>
+        </tr>
+        <tr>
+          <td style="text-align:center;font-weight:bold;">1</td>
+          <td><strong>Planning Application</strong></td>
+          <td>資源規劃：資源定義、參數設定、資源配置（排程前置作業）</td>
+        </tr>
+        <tr>
+          <td style="text-align:center;font-weight:bold;">2</td>
+          <td><strong>Scheduling Application</strong></td>
+          <td>排程核心：預先排程、特定酬載排程、手動排程調整與排程檢驗，並依排程結果產生對應報表</td>
+        </tr>
+        <tr>
+          <td style="text-align:center;font-weight:bold;">3</td>
+          <td><strong>Product Generation</strong></td>
+          <td>依據排程結果產生正確的衛星指令，由操作人員上傳給衛星據以執行排定的衛星活動</td>
+        </tr>
+        <tr>
+          <td style="text-align:center;font-weight:bold;">4</td>
+          <td><strong>Utilities</strong></td>
+          <td>提供其他功能輔助排程系統作業之進行</td>
+        </tr>
+      </table>
+      <p class="caption">表 3.3.4.3：MPSS 四大功能模組（對應圖 3.3.4.3-1 MCC 功能介紹）</p>
+
+      <!-- 3.3.4.4 Design Constraints -->
+      <div class="subsubsection-title" id="s3344">3.3.4.4 設計限制 Design Constraints</div>
+      <ul class="tasa-list">
+        <li>資源管理 CSC 必須提供 user-friendly 操作介面，讓操作人員可彈性定義電源管理、衛星記憶體配置、地面站維護週期與海外地面站可用性等參數。</li>
+        <li>RTS 排程請求/確認時間表必須遵循指定格式，參考 Remote Tracking Station ICD (FS8-ICD-0003)。</li>
+        <li>RSI 取像、衛星轉動等活動請求必須包含在任務時間表 (Mission Timeline) 中，格式定義於 Ground Segments ICD (FS8-ICD-0001)。</li>
+        <li>排程結果必須符合操作規則與資源限制條件（定義於 Rule Document [TBD]）。</li>
+        <li>福衛八號活動類型：<span class="tag tag-blue">RSI Record</span> <span class="tag tag-blue">RSI Playback</span> <span class="tag tag-blue">Attitude Maneuver</span> <span class="tag tag-blue">Orbit Maneuver</span> <span class="tag tag-blue">Go Home Maneuver</span> <span class="tag tag-blue">Misc Cmd Procedure</span> <span class="tag tag-blue">SSR Delete</span> <span class="tag tag-blue">Monitor</span></li>
+        <li>衛星指令規格類型在沿用福衛五號的 TTQ/MPQ load 外，新增 <strong>GEO Command</strong>。</li>
+        <li>資料庫必須保留衛星記憶體參數、電力參數、所有活動資料與軌道事件等。</li>
+        <li>排程系統 (Primary/Backup) 之間互為備援，資料庫需每日同步。</li>
+        <li><strong>第三方軟體限制</strong>：原福衛五號 MPSS 需限制 Chrome 版本，福衛八號 MPSS 將修正 Gantt Chart 應用程式取代 Chrome 版本限制。</li>
+        <li><strong>Memory Usage</strong>：系統無限制，但建議 32GB 以上。</li>
+      </ul>
+
+      <!-- 3.3.4.5 Operational Considerations -->
+      <div class="subsubsection-title" id="s3345">3.3.4.5 操作注意事項 Operational Considerations</div>
+      <ul class="tasa-list">
+        <li>要成功產生海外地面站接觸報告，MPSS 系統中必須先定義好海外站資訊（資源配置 CSU），且 FDF 產生的軌道事件也必須包含該相關地面站，並在所需時間區段內將軌道事件數據匯入到 MPSS 數據庫中（軌道事件 CSC）。</li>
+        <li>Product Generation CSU 需能夠訪問操控平台 XPSOC 指令資料庫，根據排程結果搭配 event template 以便可產生衛星指令集。</li>
+      </ul>
+
+      <hr class="tasa-hr">
+
+      <!-- 3.3.5 Requirements Mapping -->
+      <div class="subsection-title" id="s335">
+        <span class="num">3.3.5</span> 需求設計參照說明 Requirements Mapping to MCC System Module
+      </div>
+      <table class="req-table">
+        <tr>
+          <th>SOCC SRD ID</th>
+          <th>Requirement Text</th>
+          <th>Design Description</th>
+          <th>Compliance</th>
+        </tr>
+        <tr>
+          <td class="req-id">[SOCRD.00140]</td>
+          <td>The SOCC shall be able to generate the satellite commands/loads and deliver the commands to the TT&amp;C stations or satellite simulators for uplink to the satellite.</td>
+          <td>Product Generation CSC</td>
+          <td class="comply">✔ Comply</td>
+        </tr>
+        <tr>
+          <td class="req-id">[SOCRD.00140]</td>
+          <td>The SOCC shall be able to plan and schedule the activities of the spacecraft bus and payloads.</td>
+          <td>Scheduling/Rescheduling CSC</td>
+          <td class="comply">✔ Comply</td>
+        </tr>
+        <tr>
+          <td class="req-id">[SOCRD.00150]</td>
+          <td>The SOCC shall be able to schedule the routine and contingency operation commands.</td>
+          <td>Product Generation CSC</td>
+          <td class="comply">✔ Comply</td>
+        </tr>
+        <tr>
+          <td class="req-id">[SOCRD.00160]</td>
+          <td>The SOCC shall be able to re-schedule the activities and commands for operational changes.</td>
+          <td>Scheduling/Rescheduling CSC</td>
+          <td class="comply">✔ Comply</td>
+        </tr>
+        <tr>
+          <td class="req-id">[SOCRD.00170]</td>
+          <td>The SOCC shall be able to generate the command loads for uplink to the satellites.</td>
+          <td>Product Generation CSC</td>
+          <td class="comply">✔ Comply</td>
+        </tr>
+        <tr>
+          <td class="req-id">[SOCRD.00180]</td>
+          <td>The SOCC shall be able to manage the resources of the satellites and ground facility.</td>
+          <td>Resource Management CSC</td>
+          <td class="comply">✔ Comply</td>
+        </tr>
+        <tr>
+          <td class="req-id">[SOCRD.00550]</td>
+          <td>The SOCC shall have the capability to process the RSI mission timeline generated by IPS and coordinate all requests of the FORMOSAT-series missions and generate a final acquisition schedule.</td>
+          <td>Scheduling/Rescheduling CSC</td>
+          <td class="comply">✔ Comply</td>
+        </tr>
+      </table>
+
+    </div>
+  </div>
+
+  <!-- ===== SECTION 4.3 MCC Detail Design ===== -->
+  <div class="section-card" id="s43">
+    <div class="section-header">
+      <span class="section-num">4.3</span>
+      <h2>MCC Detail Design</h2>
+      <span class="section-en">Detailed Component Design</span>
+    </div>
+    <div class="section-body">
+
+      <!-- 4.3.1 Orbit Event Process CSC -->
+      <div class="csc-block" id="s431">
+        <div class="csc-header">
+          <span class="csc-tag">CSC 1</span>
+          Orbit Event Process CSC &nbsp;·&nbsp; 軌道事件處理
+        </div>
+        <div class="csc-body">
+          <p class="body-text">Orbit Event Process CSC 主要是根據 FDF 次系統所提供的衛星軌道事件資料，產生與衛星相關之地面站時間、角度等資訊，以作為排程的依據。</p>
+
+          <div class="detail-title">Design Specification / Constraints</div>
+          <ul class="tasa-list level2">
+            <li>MCC 將使用從 FDF 所提供的資料產生酬載與衛星活動規劃與排程。</li>
+            <li>FDF 將提供 2 種檔案，包含軌道事件結果 (Rev Report, Contact Report)。</li>
+            <li>軌道事件處理功能將使用「唯一標識符」來識別並解析軌道資料並匯入數據庫中。</li>
+            <li>MPSS 應提供介面透過 GCN 收集所有 FDF 信息或數據，包括匯入軌道事件檔案。</li>
+            <li>MPSS 必須能夠支援衛星軌道轉換操作。</li>
+          </ul>
+
+          <div class="detail-title">軌道事件種類 (Orbit Events)</div>
+          <ul class="tasa-list level2">
+            <li>Ascending Node / Descending Node</li>
+            <li>Orbit Number</li>
+            <li>Earth/Sun Penumbra/Umbra Enter/Exit</li>
+            <li>Contact 0° rise/fade of S-Band Sites</li>
+            <li>Contact 10° rise/fade of S-Band Sites</li>
+            <li>Contact 11.5° rise/fade of X-Band Sites</li>
+            <li>Contact 30° rise/fade of X-Band Transportable Sites</li>
+            <li>Maximum elevation of contact</li>
+          </ul>
+
+          <div class="io-row">
+            <div class="io-box input">
+              <div class="io-label">Inputs</div>
+              <ul class="tasa-list level3">
+                <li>Orbit Events (from FDF)</li>
+                <li>Orbit Maneuver Plan</li>
+              </ul>
+            </div>
+            <div class="io-box output">
+              <div class="io-label">Outputs (MPSS DB Tables)</div>
+              <ul class="tasa-list level3">
+                <li>contact</li>
+                <li>eclipse</li>
+                <li>rev</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4.3.2 Resource Management CSC -->
+      <div class="csc-block" id="s432">
+        <div class="csc-header">
+          <span class="csc-tag">CSC 2</span>
+          Resource Management CSC &nbsp;·&nbsp; 資源管理
+        </div>
+        <div class="csc-body">
+          <p class="body-text">Resource Management CSC 負責定義衛星與地面站之資源參數與相關時間參數，並依衛星規格訂定限制參數。細分為 3 個 CSU。</p>
+
+          <!-- CSU 1 -->
+          <div class="csu-block">
+            <div class="csu-title">CSU 1：Resource Configuration CSU</div>
+            <p class="body-text">用於管理調度程序使用的地面站和衛星資源，提供 GUI 操作介面，讓任務分析師可有彈性地定義/修改/刪除電源管理、衛星記憶體配置、地面站維護週期與海外地面站可用性等。</p>
+            <div class="io-row">
+              <div class="io-box input">
+                <div class="io-label">Inputs</div>
+                <p style="font-size:11px;">GUI 操作介面，可彈性新增或修改地面站及衛星資源</p>
+              </div>
+              <div class="io-box output">
+                <div class="io-label">Outputs (MPSS DB Tables)</div>
+                <ul class="tasa-list level4">
+                  <li>dutycycle</li><li>recorder</li><li>recorderps</li>
+                  <li>site</li><li>siteps</li><li>satellite</li><li>satelliteps</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- CSU 2 -->
+          <div class="csu-block">
+            <div class="csu-title">CSU 2：RTS Schedule Management CSU</div>
+            <p class="body-text">向海外地面站進行排程請求，並確認所請求的時間區段可順利支援任務。發送海外站使用請求，等海外站評估後回傳允許使用報告。請求/確認格式參考 Remote Tracking Station ICD (FS8-ICD-0003)。</p>
+            <div class="io-row">
+              <div class="io-box input">
+                <div class="io-label">Inputs</div>
+                <p style="font-size:11px;">GUI 操作介面，輸入欲進行排程時間區段</p>
+              </div>
+              <div class="io-box output">
+                <div class="io-label">Outputs</div>
+                <p style="font-size:11px;">產出符合海外地面站請求格式檔案（格式參考 FS8-ICD-0003）</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- CSU 3 -->
+          <div class="csu-block">
+            <div class="csu-title">CSU 3：RTCS Management CSU</div>
+            <p class="body-text">RTCS (Relative Time Command Sequence) Management 用來管理事件模板 (Event Template)，包含執行每種活動類型所需的命令序列。活動對應的事件模型以 ASCII 格式儲存在 MPSS 系統內。</p>
+            <div class="detail-title" style="margin-left:0;">支援的 Event Template 類型</div>
+            <ul class="tasa-list level2">
+              <li>Contact：ACQ_S.etf、ACQ_E.etf</li>
+              <li>Science Payload PBK：Science_PLD_PBK.etf</li>
+              <li>Cmd Proc：RTCMD or MISC or Science_Pld_PROC</li>
+              <li>Maneuver Event：ATT_MAN.etf</li>
+              <li>Orbit Maneuver：ORB_MAN.etf</li>
+              <li>RSI Playback：RSI_PBK.etf</li>
+              <li>RSI Record：RSI_REC.etf</li>
+              <li>SSR Delete：SSR_DEL.etf</li>
+              <li>Sup Maneuver：GOHOME_MAN.etf</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4.3.3 Scheduling CSC -->
+      <div class="csc-block" id="s433">
+        <div class="csc-header">
+          <span class="csc-tag">CSC 3</span>
+          Scheduling / Rescheduling CSC &nbsp;·&nbsp; 排程事件規劃
+        </div>
+        <div class="csc-body">
+          <p class="body-text">排程核心部份，提供預先排程、特定酬載排程、手動排程調整與排程檢驗等功能，並依排程結果產生相對應的報表供操作人員參考。細分為 7 個 CSU。</p>
+
+          <div class="csu-block">
+            <div class="csu-title">CSU 1：Session Manager CSU</div>
+            <p class="body-text">定義所要進行排程的時間區段，並引入相關的衛星及地面站資源組態。</p>
+          </div>
+
+          <div class="csu-block">
+            <div class="csu-title">CSU 2：Activity Request Editor CSU</div>
+            <p class="body-text">提供介面供使用者手動建立新的衛星活動。福衛八號目前支援的衛星活動類型如下：</p>
+            <ul class="tasa-list level2">
+              <li>健康狀態觀測</li>
+              <li>衛星轉動</li>
+              <li>RSI 取像</li>
+              <li>RSI 下載</li>
+              <li>科學資料下載</li>
+              <li>軌道傳換</li>
+              <li>衛星通訊開關</li>
+            </ul>
+          </div>
+
+          <div class="csu-block">
+            <div class="csu-title">CSU 3：Cold Scheduler CSU</div>
+            <p class="body-text">進行預先排程，針對既有的衛星及地面站資源組態進行確認。排程過程必須符合操作規則與限制條件（福衛八號規則文件 [TBD]）。繼承上個 session 遺留下來的活動並產生本 session 所有健康狀態觀測活動。</p>
+          </div>
+
+          <div class="csu-block">
+            <div class="csu-title">CSU 4：External Activity Scheduler CSU</div>
+            <p class="body-text">因應任務酬載 (RSI 或 Science Payload) 需求進行特定酬載的排程作業。RSI 與酬載外部請求檔案格式必須符合 Ground Segments ICD (FS8-ICD-0001)。</p>
+            <div class="io-row">
+              <div class="io-box input">
+                <div class="io-label">Inputs</div>
+                <p style="font-size:11px;">RSI 與 Science Payload Mission Timeline</p>
+              </div>
+              <div class="io-box output">
+                <div class="io-label">Outputs</div>
+                <ul class="tasa-list level4">
+                  <li>RSI Record</li>
+                  <li>RSI Playback</li>
+                  <li>SSR Delete</li>
+                  <li>Maneuver</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="csu-block">
+            <div class="csu-title">CSU 5：Gantt Chart CSU</div>
+            <p class="body-text">提供圖形化介面呈現特定時段排程結果，包含可調度衛星、地面站、軌道事件、衛星活動等。讓任務分析師 (MA) 可以手動調整優化排程結果。</p>
+          </div>
+
+          <div class="csu-block">
+            <div class="csu-title">CSU 6：Scheduler Validation CSU</div>
+            <p class="body-text">確認排程結果無誤且不違反既定操作規則與資源限制。驗證規則包括：</p>
+            <ul class="tasa-list level2">
+              <li>RSI cannot overlap PBK</li>
+              <li>Site Turnaround time</li>
+              <li>Antenna unavailable for time range</li>
+              <li>Contact Bounds</li>
+              <li>Duty Cycle</li>
+              <li>Latitude Time Maneuver / Latitude Time Go Maneuver</li>
+              <li>Maneuver Interval</li>
+              <li>Rec RSI Capacity</li>
+              <li>RSI Record activity scheduled outside RFPA window</li>
+            </ul>
+          </div>
+
+          <div class="csu-block">
+            <div class="csu-title">CSU 7：Schedule Report CSU</div>
+            <p class="body-text">產生排程結果相關報表。報告格式必須符合 Ground Segments ICD (FS8-ICD-0001)。</p>
+            <div class="io-box output" style="margin-top:8px;">
+              <div class="io-label">Report Outputs</div>
+              <ul class="tasa-list level4">
+                <li>Pass Plan</li>
+                <li>ASR (Acquisition Schedule Report)</li>
+                <li>Duty Cycle Report</li>
+                <li>SSR Usage Report</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4.3.4 Product Generation CSC -->
+      <div class="csc-block" id="s434">
+        <div class="csc-header">
+          <span class="csc-tag">CSC 4</span>
+          Product Generation CSC &nbsp;·&nbsp; 衛星指令集產生
+        </div>
+        <div class="csc-body">
+          <p class="body-text">依據排程結果產生正確的衛星指令，由操作人員上傳給衛星據以執行排定的衛星活動。根據驗證過的排程結果產生 TTQ 與 MPQ 指令集。</p>
+          <div class="detail-title">Design Specification / Constraints</div>
+          <ul class="tasa-list level2">
+            <li>需預先由 RTCS 管理模組建立每個活動所對應的事件模型。</li>
+            <li>指令類型除原有的 TTQ、MPQ 外新增了 <strong>GEO command</strong>，格式定義在 CAD (Command Allocation Document) 文件中。</li>
+          </ul>
+          <div class="io-row">
+            <div class="io-box input">
+              <div class="io-label">Inputs</div>
+              <ul class="tasa-list level4">
+                <li>Scheduled Events</li>
+                <li>Event Templates</li>
+                <li>Stored Command Procedures</li>
+                <li>MPSS Database</li>
+              </ul>
+            </div>
+            <div class="io-box output">
+              <div class="io-label">Outputs</div>
+              <ul class="tasa-list level4">
+                <li>Command Loads (TTQ / MPQ / GEO)</li>
+                <li>Command Reports</li>
+                <li>Pass Plan</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4.3.5 Utilities CSC -->
+      <div class="csc-block" id="s435">
+        <div class="csc-header">
+          <span class="csc-tag">CSC 5</span>
+          Utilities CSC &nbsp;·&nbsp; 輔助工具
+        </div>
+        <div class="csc-body">
+          <p class="body-text">提供其他功能輔助排程系統作業之進行。包含 4 個 CSU。</p>
+
+          <div class="csu-block">
+            <div class="csu-title">CSU 1：Data Transfer CSU</div>
+            <p class="body-text">提供 FTP 功能下載軌道資料及 RSI、科學酬載 Mission Timeline。Json file 檔定義相關 FTP 設定，User 透過 web 介面操作 FTP Process 進行檔案傳輸。</p>
+          </div>
+
+          <div class="csu-block">
+            <div class="csu-title">CSU 2：Product Transfer CSU</div>
+            <p class="body-text">提供 FTP 功能以傳送衛星指令到適當的工作站。可透過 FTP 功能將排程後產生的衛星指令集送至 XPSOC 操作系統等待上傳給衛星。可根據時間區段與檔案類型過濾出對應的資料上傳給 XPSOC 操作系統。</p>
+          </div>
+
+          <div class="csu-block">
+            <div class="csu-title">CSU 3：Purge Database/File CSU</div>
+            <p class="body-text">避免系統因過期資料太多導致效能低下，定期清除資料庫中特定資料表或選定區段的暫存資料。</p>
+            <div class="warn-box">
+              ⚠ 由 Activity Request Editor CSU 產生的衛星活動不可被清除。為維持排程的連續性，必須至少保留一段完整的時間區段資料。
+            </div>
+          </div>
+
+          <div class="csu-block">
+            <div class="csu-title">CSU 4：Database Management CSU</div>
+            <p class="body-text">用於管理資料庫避免資料遺失，包含資料備份與還原功能。資料庫必須能夠處理衛星記憶體參數、衛星電量消耗參數、衛星所有活動與軌道資料。透過系統定時功能，執行資料庫備份 bat file，並同步至別的主機，產生資料庫備份檔 <code>*.dump</code>。</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div><!-- /container -->
+
+<!-- ===== FOOTER ===== -->
+<div class="page-footer">
+  <span>FS8-NSPO-RPT-0095 &nbsp;|&nbsp; FORMOSAT-8 SOC System Design Document</span>
+  <span>National Space Organization (NSPO) &nbsp;·&nbsp; 國家太空中心 &nbsp;·&nbsp; 2019/12/02</span>
+</div>
+
+</body>
+</html>

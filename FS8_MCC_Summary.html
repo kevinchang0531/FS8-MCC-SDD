@@ -1,0 +1,1200 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FS8 MCC — 系統摘要</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: Arial, "微軟正黑體", sans-serif;
+  font-size: 13px;
+  color: #1a1a1a;
+  background: #eef1f5;
+  line-height: 1.6;
+}
+
+/* ── Header ── */
+.page-header {
+  background: #003366;
+  padding: 0;
+}
+.header-band {
+  background: #001f44;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 28px;
+  font-size: 10px;
+  color: #6699bb;
+  letter-spacing: 0.8px;
+}
+.header-main {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  padding: 16px 28px 12px;
+}
+.header-logo {
+  border-right: 1px solid #336699;
+  padding-right: 22px;
+  margin-right: 22px;
+  text-align: center;
+}
+.header-logo .en { font-size: 9px; color: #6699bb; letter-spacing: 1.5px; text-transform: uppercase; }
+.header-logo .cn { font-size: 18px; font-weight: bold; color: #fff; letter-spacing: 5px; margin-top: 2px; }
+.header-titles h1 { font-size: 19px; color: #fff; font-weight: bold; line-height: 1.25; }
+.header-titles .sub { font-size: 11px; color: #88aacc; margin-top: 5px; }
+.header-badge {
+  margin-left: auto;
+  text-align: right;
+}
+.header-badge .doc-id { font-size: 11px; color: #88aacc; }
+.header-badge .doc-date { font-size: 13px; color: #fff; font-weight: bold; margin-top: 2px; }
+.stripe { height: 5px; background: linear-gradient(to right, #cc3300 0%, #cc3300 28%, #003366 28%); }
+
+/* ── Layout ── */
+.wrap { max-width: 1080px; margin: 22px auto; padding: 0 16px 40px; }
+
+/* ── Section cards ── */
+.card {
+  background: #fff;
+  margin-bottom: 18px;
+  box-shadow: 0 1px 4px rgba(0,0,0,.08);
+}
+.card-head {
+  display: flex;
+  align-items: stretch;
+  background: #003366;
+  color: #fff;
+}
+.card-head .icon {
+  background: #cc3300;
+  width: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+.card-head .titles {
+  padding: 10px 16px;
+}
+.card-head h2 { font-size: 14px; font-weight: bold; }
+.card-head .en-title { font-size: 10px; color: #88aacc; margin-top: 2px; letter-spacing: 0.5px; }
+.card-body { padding: 18px 20px; }
+
+/* ── Architecture diagram ── */
+.arch-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.arch-row {
+  display: flex;
+  gap: 10px;
+  align-items: stretch;
+}
+.arch-label {
+  width: 90px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  font-size: 10px;
+  font-weight: bold;
+  color: #003366;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  border-right: 2px solid #003366;
+  padding-right: 10px;
+}
+.arch-boxes {
+  display: flex;
+  gap: 10px;
+  flex: 1;
+  flex-wrap: wrap;
+}
+.abox {
+  flex: 1;
+  min-width: 120px;
+  border: 1px solid #ccd6e0;
+  padding: 9px 12px;
+  background: #f5f8fb;
+}
+.abox.primary { background: #003366; border-color: #cc3300; border-width: 2px; }
+.abox.primary .abox-title,
+.abox.primary .abox-desc { color: #fff; }
+.abox.secondary { background: #e8eef5; border-color: #336699; }
+.abox.gray { background: #f5f5f5; border-color: #bbb; }
+.abox-title { font-size: 11px; font-weight: bold; color: #003366; margin-bottom: 3px; }
+.abox.secondary .abox-title { color: #003366; }
+.abox.gray .abox-title { color: #555; }
+.abox-desc { font-size: 10px; color: #555; line-height: 1.4; }
+.abox.gray .abox-desc { color: #777; }
+
+/* arrow */
+.arr { text-align: center; color: #336699; font-size: 16px; line-height: 1; flex-shrink: 0; align-self: center; }
+
+/* CSC tree */
+.csc-tree {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  margin-top: 14px;
+}
+.csc-node {
+  border-top: 3px solid var(--c);
+  background: #f5f8fb;
+  padding: 9px 10px;
+}
+.csc-node .n { font-size: 10px; font-weight: bold; color: var(--c); margin-bottom: 4px; }
+.csc-node .t { font-size: 11px; font-weight: bold; color: #1a1a1a; margin-bottom: 3px; }
+.csc-node .d { font-size: 10px; color: #555; line-height: 1.4; }
+.csc-node ul { margin: 4px 0 0 10px; padding: 0; }
+.csc-node li { font-size: 10px; color: #666; list-style: disc; margin-bottom: 1px; }
+
+/* ── Interface table ── */
+.ifc-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.ifc-panel {
+  border: 1px solid #ccd6e0;
+}
+.ifc-panel-head {
+  padding: 7px 12px;
+  font-size: 11px;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+.ifc-panel-head.recv { background: #006633; color: #fff; }
+.ifc-panel-head.send { background: #660033; color: #fff; }
+.ifc-row {
+  display: flex;
+  border-bottom: 1px solid #eee;
+  font-size: 11px;
+}
+.ifc-row:last-child { border-bottom: none; }
+.ifc-peer {
+  width: 90px;
+  flex-shrink: 0;
+  padding: 7px 10px;
+  font-weight: bold;
+  color: #003366;
+  background: #f5f8fb;
+  border-right: 1px solid #e0e5ea;
+}
+.ifc-data { padding: 7px 10px; color: #333; flex: 1; }
+.ifc-tag {
+  display: inline-block;
+  font-size: 9px;
+  padding: 1px 5px;
+  font-weight: bold;
+  margin-right: 3px;
+  vertical-align: middle;
+}
+.t-in { background: #006633; color: #fff; }
+.t-out { background: #660033; color: #fff; }
+.t-blue { background: #003366; color: #fff; }
+.t-green { background: #336699; color: #fff; }
+
+.icd-note {
+  font-size: 10px;
+  color: #888;
+  margin-top: 8px;
+  border-top: 1px dashed #ccc;
+  padding-top: 6px;
+}
+
+/* ── Functions grid ── */
+.func-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.func-card {
+  border-left: 4px solid var(--c);
+  background: #f7f9fc;
+  padding: 12px 14px;
+}
+.func-card .fc-num {
+  font-size: 9px;
+  font-weight: bold;
+  color: var(--c);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.func-card .fc-title {
+  font-size: 13px;
+  font-weight: bold;
+  color: #1a1a1a;
+  margin-bottom: 6px;
+}
+.func-card .fc-sub {
+  font-size: 10px;
+  color: #666;
+  margin-bottom: 8px;
+}
+.func-card ul { margin: 0 0 0 14px; padding: 0; }
+.func-card li { font-size: 11px; color: #333; margin-bottom: 3px; line-height: 1.5; }
+.func-card .fc-outputs {
+  margin-top: 8px;
+  padding-top: 6px;
+  border-top: 1px dashed #ccc;
+  font-size: 10px;
+  color: #555;
+}
+.func-card .fc-outputs strong { color: #003366; }
+
+/* ── Tech highlights ── */
+.tech-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.tech-card {
+  background: #f5f8fb;
+  border-top: 3px solid var(--c);
+  padding: 12px 14px;
+}
+.tech-card .tc-icon { font-size: 22px; margin-bottom: 6px; }
+.tech-card .tc-title {
+  font-size: 11px;
+  font-weight: bold;
+  color: var(--c);
+  margin-bottom: 5px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.tech-card .tc-body { font-size: 11px; color: #333; line-height: 1.6; }
+.tech-card .tc-body strong { color: #003366; }
+
+.compare-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+  margin-top: 14px;
+}
+.compare-table th {
+  background: #003366;
+  color: #fff;
+  padding: 7px 10px;
+  text-align: left;
+}
+.compare-table td {
+  padding: 6px 10px;
+  border-bottom: 1px solid #e0e5ea;
+  vertical-align: top;
+}
+.compare-table tr:nth-child(even) td { background: #f5f8fb; }
+.compare-table td:first-child { font-weight: bold; color: #003366; }
+.hl { color: #cc3300; font-weight: bold; }
+.ok { color: #006633; font-weight: bold; }
+
+/* ── Resource management ── */
+.res-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.res-card {
+  border: 1px solid #ccd6e0;
+  background: #f7f9fc;
+}
+.res-card-head {
+  background: var(--c);
+  color: #fff;
+  font-size: 11px;
+  font-weight: bold;
+  padding: 6px 12px;
+  letter-spacing: 0.5px;
+}
+.res-card-body { padding: 10px 12px; }
+.res-card-body ul { margin: 0 0 0 14px; padding: 0; }
+.res-card-body li { font-size: 11px; color: #333; margin-bottom: 3px; line-height: 1.5; }
+.res-card-body .db-tag {
+  display: inline-block;
+  font-size: 9px;
+  background: #003366;
+  color: #fff;
+  padding: 1px 5px;
+  font-family: monospace;
+  margin: 1px;
+}
+
+/* ── Activity table ── */
+.act-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+  margin: 10px 0;
+}
+.act-table th {
+  background: #003366;
+  color: #fff;
+  padding: 7px 10px;
+  text-align: left;
+}
+.act-table th:first-child { width: 24px; text-align: center; }
+.act-table td {
+  padding: 6px 10px;
+  border-bottom: 1px solid #e0e5ea;
+  vertical-align: top;
+}
+.act-table tr:nth-child(even) td { background: #f5f8fb; }
+.act-table td.etf { font-family: monospace; font-size: 10px; color: #336699; }
+.act-badge {
+  display: inline-block;
+  font-size: 10px;
+  padding: 2px 7px;
+  font-weight: bold;
+  color: #fff;
+  white-space: nowrap;
+}
+
+/* ── Constraint rules ── */
+.rule-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin: 12px 0;
+}
+.rule-item {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  background: #f5f8fb;
+  border-left: 3px solid var(--c, #cc3300);
+  padding: 7px 10px;
+  font-size: 11px;
+}
+.rule-num {
+  font-size: 10px;
+  font-weight: bold;
+  color: var(--c, #cc3300);
+  min-width: 24px;
+  text-align: center;
+  margin-top: 1px;
+}
+.rule-body .rule-title { font-weight: bold; color: #1a1a1a; }
+.rule-body .rule-desc { color: #555; font-size: 10px; margin-top: 2px; line-height: 1.4; }
+
+.flow-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 14px 0 8px;
+  flex-wrap: wrap;
+}
+.flow-step {
+  background: #003366;
+  color: #fff;
+  font-size: 11px;
+  font-weight: bold;
+  padding: 5px 12px;
+}
+.flow-step.alt { background: #336699; }
+.flow-step.end { background: #cc3300; }
+.flow-arrow { color: #336699; font-size: 16px; }
+
+/* ── Footer ── */
+.footer {
+  background: #001f44;
+  color: #5588aa;
+  font-size: 10px;
+  padding: 10px 28px;
+  display: flex;
+  justify-content: space-between;
+  margin-top: 32px;
+}
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="page-header">
+  <div class="header-band">
+    <span>FORMOSAT-8 衛星任務地面控制系統</span>
+    <span>FS8-TASA-RPT-0095 · Issue 00 Rev 00</span>
+  </div>
+  <div class="header-main">
+    <div class="header-logo">
+      <div class="en">Taiwan Space Agency</div>
+      <div class="cn">國家太空中心</div>
+    </div>
+    <div class="header-titles">
+      <h1>FS8 MCC 系統架構摘要</h1>
+      <div class="sub">Mission Control Center — System Architecture Summary</div>
+    </div>
+    <div class="header-badge">
+      <div class="doc-id">FS8-TASA-RPT-0095</div>
+      <div class="doc-date">2019 / 12 / 02</div>
+    </div>
+  </div>
+  <div class="stripe"></div>
+</div>
+
+<div class="wrap">
+
+  <!-- ════════════════════════════════════
+       CARD 1: 系統架構
+  ═════════════════════════════════════ -->
+  <div class="card">
+    <div class="card-head">
+      <div class="icon">①</div>
+      <div class="titles">
+        <h2>系統架構</h2>
+        <div class="en-title">System Architecture</div>
+      </div>
+    </div>
+    <div class="card-body">
+
+      <!-- 第一層: SOCC -->
+      <div class="arch-wrap">
+        <div class="arch-row">
+          <div class="arch-label">SOCC<br>地面操控中心</div>
+          <div class="arch-boxes">
+            <div class="abox secondary">
+              <div class="abox-title">MOC</div>
+              <div class="abox-desc">任務操作中心<br>衛星即時操控<br>ARCOS 平台</div>
+            </div>
+            <div class="abox primary">
+              <div class="abox-title">MCC ← 本系統</div>
+              <div class="abox-desc">任務控制中心<br>任務規劃與排程<br>MPSS 軟體</div>
+            </div>
+            <div class="abox secondary">
+              <div class="abox-title">FDF</div>
+              <div class="abox-desc">飛行動態設施<br>軌道決定與預測<br>OASYS 軟體</div>
+            </div>
+            <div class="abox secondary">
+              <div class="abox-title">SCC</div>
+              <div class="abox-desc">科學控制中心<br>科學酬載規劃<br>資料初處理</div>
+            </div>
+            <div class="abox secondary">
+              <div class="abox-title">GCN</div>
+              <div class="abox-desc">地面通訊網路<br>LAN 1000Mbps<br>WAN VPN</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="arch-row">
+          <div class="arch-label">MCC<br>內部架構</div>
+          <div class="arch-boxes" style="flex-direction:column;gap:8px;">
+            <!-- 3-tier -->
+            <div style="display:flex;gap:8px;align-items:center;">
+              <div class="abox gray" style="flex:1;">
+                <div class="abox-title">Client Layer</div>
+                <div class="abox-desc">HTML + JavaScript · 一般瀏覽器存取 · 不限地點</div>
+              </div>
+              <div class="arr">⇄</div>
+              <div class="abox gray" style="flex:1;">
+                <div class="abox-title">Application Server</div>
+                <div class="abox-desc">Java · XML 交換格式 · 跨平台</div>
+              </div>
+              <div class="arr">⇄</div>
+              <div class="abox gray" style="flex:1;">
+                <div class="abox-title">Database</div>
+                <div class="abox-desc">PostgreSQL (Open Source) · Windows 平台</div>
+              </div>
+            </div>
+            <!-- hardware -->
+            <div style="display:flex;gap:8px;">
+              <div class="abox gray" style="flex:1;">
+                <div class="abox-title">Primary MPSS</div>
+                <div class="abox-desc">i7-9700 · 64GB RAM · 256G SSD+2TB HDD · Win</div>
+              </div>
+              <div class="arr" style="color:#cc3300;font-size:12px;">每日<br>同步</div>
+              <div class="abox gray" style="flex:1;">
+                <div class="abox-title">Backup MPSS</div>
+                <div class="abox-desc">規格相同 · 自動備援 · 資料庫每日同步</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CSC tree -->
+        <div class="arch-row">
+          <div class="arch-label">MCC<br>5大 CSC</div>
+          <div style="flex:1;">
+            <div class="csc-tree">
+              <div class="csc-node" style="--c:#003366;">
+                <div class="n">CSC 1</div>
+                <div class="t">軌道事件處理</div>
+                <div class="d">Orbit Event Process</div>
+                <ul><li>Rev Report 解析</li><li>Contact Report</li><li>存入 DB</li></ul>
+              </div>
+              <div class="csc-node" style="--c:#336699;">
+                <div class="n">CSC 2</div>
+                <div class="t">資源管理</div>
+                <div class="d">Resource Management</div>
+                <ul><li>地面站配置</li><li>RTS 排程請求/接收</li><li>事件模板管理</li></ul>
+              </div>
+              <div class="csc-node" style="--c:#006666;">
+                <div class="n">CSC 3</div>
+                <div class="t">排程規劃</div>
+                <div class="d">Scheduling / Rescheduling</div>
+                <ul><li>Cold Scheduler</li><li>Hot Scheduler</li><li>Gantt Chart</li><li>排程驗證</li></ul>
+              </div>
+              <div class="csc-node" style="--c:#cc3300;">
+                <div class="n">CSC 4</div>
+                <div class="t">指令集產生</div>
+                <div class="d">Product Generation</div>
+                <ul><li>TTQ / MPQ</li><li>GEO Command</li><li>Pass Plan</li></ul>
+              </div>
+              <div class="csc-node" style="--c:#666;">
+                <div class="n">CSC 5</div>
+                <div class="t">輔助工具</div>
+                <div class="d">Utilities</div>
+                <ul><li>SFTP 傳輸</li><li>資料清除</li><li>DB 備份</li></ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════
+       CARD 2: 資料交換介面
+  ═════════════════════════════════════ -->
+  <div class="card">
+    <div class="card-head">
+      <div class="icon">②</div>
+      <div class="titles">
+        <h2>資料交換介面</h2>
+        <div class="en-title">Data Exchange Interfaces</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="ifc-grid">
+        <!-- Receiving -->
+        <div class="ifc-panel">
+          <div class="ifc-panel-head recv">▼ Receiving — MCC 接收</div>
+          <div class="ifc-row">
+            <div class="ifc-peer">FDF</div>
+            <div class="ifc-data">
+              <span class="ifc-tag t-in">內部</span>
+              Rev Report（軌道圈次事件）<br>
+              Contact Report（地面站接觸報告）
+            </div>
+          </div>
+          <div class="ifc-row">
+            <div class="ifc-peer">IPS-PSS</div>
+            <div class="ifc-data">
+              <span class="ifc-tag t-green">外部</span>
+              RSI Mission Timeline<br>
+              <span style="font-size:10px;color:#888;">格式：FS8-ICD-0001</span>
+            </div>
+          </div>
+          <div class="ifc-row">
+            <div class="ifc-peer">SCC</div>
+            <div class="ifc-data">
+              <span class="ifc-tag t-in">內部</span>
+              Science Payload Mission Timeline<br>
+              科學酬載實驗排程需求
+            </div>
+          </div>
+          <div class="ifc-row">
+            <div class="ifc-peer">RTS</div>
+            <div class="ifc-data">
+              <span class="ifc-tag t-green">外部</span>
+              海外地面站排程<strong>確認</strong>報告<br>
+              <span style="font-size:10px;color:#888;">格式：FS8-ICD-0003</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sending -->
+        <div class="ifc-panel">
+          <div class="ifc-panel-head send">▲ Sending — MCC 傳送</div>
+          <div class="ifc-row">
+            <div class="ifc-peer">MOC</div>
+            <div class="ifc-data">
+              <span class="ifc-tag t-in">內部</span>
+              <strong>TTQ</strong> Time-Tagged Queue 指令佇列<br>
+              <strong>MPQ</strong> Mission Planning Queue 指令佇列<br>
+              <strong>GEO</strong> Geo Command（FS8 新增）<br>
+              Pass Plan（接觸規劃表）
+            </div>
+          </div>
+          <div class="ifc-row">
+            <div class="ifc-peer">RTS</div>
+            <div class="ifc-data">
+              <span class="ifc-tag t-green">外部</span>
+              海外地面站排程<strong>請求</strong>檔案<br>
+              <span style="font-size:10px;color:#888;">格式：FS8-ICD-0003</span>
+            </div>
+          </div>
+          <div class="ifc-row">
+            <div class="ifc-peer">SCC / 操作人員</div>
+            <div class="ifc-data">
+              <span class="ifc-tag t-in">內部</span>
+              ASR（Acquisition Schedule Report）<br>
+              Duty Cycle Report / SSR Report
+            </div>
+          </div>
+          <div class="ifc-row">
+            <div class="ifc-peer">ARCOS</div>
+            <div class="ifc-data">
+              <span class="ifc-tag t-in">內部</span>
+              指令集檔案 via SFTP（Product Transfer）<br>
+              <span style="font-size:10px;color:#888;">由 MOC ARCOS 上鏈至衛星</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ICD note -->
+      <div class="icd-note">
+        參考文件：
+        &nbsp;·&nbsp; <strong>FS8-ICD-0001</strong> Ground Segments Interface Control Document（RSI/酬載格式）
+        &nbsp;·&nbsp; <strong>FS8-ICD-0003</strong> Remote Tracking Station ICD（RTS 排程格式）
+        &nbsp;·&nbsp; <strong>CAD</strong> Command Allocation Document（指令格式）
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════
+       CARD 3: 主要功能
+  ═════════════════════════════════════ -->
+  <div class="card">
+    <div class="card-head">
+      <div class="icon">③</div>
+      <div class="titles">
+        <h2>主要功能</h2>
+        <div class="en-title">Main Functions — MPSS 四大功能模組</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="func-grid">
+
+        <div class="func-card" style="--c:#003366;">
+          <div class="fc-num">Module 1 · Planning</div>
+          <div class="fc-title">資源規劃 Planning Application</div>
+          <div class="fc-sub">排程作業必須的前置作業</div>
+          <ul>
+            <li>資源定義（衛星、地面站、海外站）</li>
+            <li>衛星記憶體 / 電量參數設定</li>
+            <li>地面站維護週期與可用性配置</li>
+            <li>RTS 海外站排程請求與管理</li>
+            <li>事件模板管理（9 種 .etf 類型）</li>
+          </ul>
+          <div class="fc-outputs"><strong>Output：</strong>MPSS DB 資源組態、海外站請求檔</div>
+        </div>
+
+        <div class="func-card" style="--c:#336699;">
+          <div class="fc-num">Module 2 · Scheduling</div>
+          <div class="fc-title">排程規劃 Scheduling Application</div>
+          <div class="fc-sub">排程核心，7 個 CSU 組成</div>
+          <ul>
+            <li><strong>Session Manager</strong>：定義排程時間區段</li>
+            <li><strong>Cold Scheduler</strong>：自動預先排程（健康觀測活動）</li>
+            <li><strong>External Activity Scheduler</strong>：RSI/科學酬載排程匯入</li>
+            <li><strong>Activity Request Editor</strong>：手動建立衛星活動</li>
+            <li><strong>Gantt Chart</strong>：圖形化排程調整介面</li>
+            <li><strong>Scheduler Validation</strong>：10 項規則驗證</li>
+            <li><strong>Schedule Report</strong>：ASR / Duty Cycle / SSR utilization</li>
+          </ul>
+          <div class="fc-outputs"><strong>Output：</strong>無衝突排程結果、作業報表</div>
+        </div>
+
+        <div class="func-card" style="--c:#cc3300;">
+          <div class="fc-num">Module 3 · Product Generation</div>
+          <div class="fc-title">指令集產生 Product Generation</div>
+          <div class="fc-sub">根據驗證後排程結果產生衛星指令</div>
+          <ul>
+            <li>依事件模板 (Event Template) 展開指令時序</li>
+            <li>產生 <strong>TTQ</strong>（Time-Tagged Queue）</li>
+            <li>產生 <strong>MPQ</strong>（Mission Planning Queue）</li>
+            <li>產生 <strong>GEO Command</strong>（FS8 新增，地理指令）</li>
+            <li>產生 Pass Plan（地面站接觸計畫）</li>
+          </ul>
+          <div class="fc-outputs"><strong>Output：</strong>指令佇列檔 → MOC ARCOS → 衛星</div>
+        </div>
+
+        <div class="func-card" style="--c:#666;">
+          <div class="fc-num">Module 4 · Utilities</div>
+          <div class="fc-title">輔助工具 Utilities</div>
+          <div class="fc-sub">4 個 CSU 組成</div>
+          <ul>
+            <li><strong>Data Transfer</strong>：SFTP 下載軌道資料、Mission Timeline</li>
+            <li><strong>Product Transfer</strong>：SFTP 上傳指令集至 ARCOS</li>
+            <li><strong>Purge Database/File</strong>：定期清除過期暫存資料</li>
+            <li><strong>Database Management</strong>：定時備份 *.dump，同步至備援主機</li>
+          </ul>
+          <div class="fc-outputs"><strong>Output：</strong>DB 備份檔、傳輸確認</div>
+        </div>
+
+      </div>
+
+      <!-- Activity types -->
+      <div style="margin-top:14px;padding:10px 14px;background:#f0f4f8;border-left:4px solid #003366;">
+        <strong style="font-size:11px;color:#003366;">FS8 支援衛星活動類型（8 種）</strong>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;">
+          <span style="background:#003366;color:#fff;font-size:10px;padding:2px 8px;">RSI Record</span>
+          <span style="background:#003366;color:#fff;font-size:10px;padding:2px 8px;">RSI Playback</span>
+          <span style="background:#336699;color:#fff;font-size:10px;padding:2px 8px;">Attitude Maneuver</span>
+          <span style="background:#336699;color:#fff;font-size:10px;padding:2px 8px;">Orbit Maneuver</span>
+          <span style="background:#336699;color:#fff;font-size:10px;padding:2px 8px;">Go Home Maneuver</span>
+          <span style="background:#555;color:#fff;font-size:10px;padding:2px 8px;">Misc Cmd Procedure</span>
+          <span style="background:#555;color:#fff;font-size:10px;padding:2px 8px;">SSR Delete</span>
+          <span style="background:#555;color:#fff;font-size:10px;padding:2px 8px;">Monitor</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════
+       CARD 4: 技術重點摘要
+  ═════════════════════════════════════ -->
+  <div class="card">
+    <div class="card-head">
+      <div class="icon">④</div>
+      <div class="titles">
+        <h2>技術重點摘要</h2>
+        <div class="en-title">Technical Highlights</div>
+      </div>
+    </div>
+    <div class="card-body">
+
+      <div class="tech-grid">
+        <div class="tech-card" style="--c:#003366;">
+          <div class="tc-title">自主研發系統</div>
+          <div class="tc-body">
+            MPSS 由 TASA 操控組<strong>自主研發</strong>，已實際應用於<strong>福衛五號</strong>及<strong>福衛七號</strong>任務操作。福衛八號版本為系統升級，具完整的自主維護與演進能力。
+          </div>
+        </div>
+        <div class="tech-card" style="--c:#336699;">
+          <div class="tc-title">Web-Based 操控</div>
+          <div class="tc-body">
+            使用者介面以 <strong>HTML + JavaScript</strong> 實作，操作人員可透過<strong>任何瀏覽器</strong>、任何具安全認證網路的 PC、NB 或手持裝置存取 MPSS，不侷限於 SOCC 內部。
+          </div>
+        </div>
+        <div class="tech-card" style="--c:#006633;">
+          <div class="tc-title">3-Tier 開放架構</div>
+          <div class="tc-body">
+            採用 <strong>Java 應用伺服器 + PostgreSQL（Open Source）</strong> + <strong>XML</strong> 通用交換格式，符合開放標準，具備跨平台性與未來擴充性。
+          </div>
+        </div>
+        <div class="tech-card" style="--c:#cc3300;">
+          <div class="tc-title">FS8 新增功能</div>
+          <div class="tc-body">
+            針對 FS8 新需求客製化建置：<strong>轉動衛星進行資料下載</strong>、<strong>GEO Command 封裝</strong>（地理位置觸發指令）。
+          </div>
+        </div>
+        <div class="tech-card" style="--c:#666;">
+          <div class="tc-title">高可用性備援</div>
+          <div class="tc-body">
+            Primary / Backup 雙主機架構，<strong>每日自動同步</strong> PostgreSQL 資料庫（*.dump），確保系統在硬體或 OS 崩潰時可立即切換，不中斷任務操作。
+          </div>
+        </div>
+        <div class="tech-card" style="--c:#553399;">
+          <div class="tc-title">排程驗證機制</div>
+          <div class="tc-body">
+            Scheduler Validation CSU 內建 <strong>10 項規則驗證</strong>（含 Duty Cycle、Maneuver Interval、Contact Bounds、RFPA Window 等），確保排程結果無衝突、符合衛星操作限制。
+          </div>
+        </div>
+      </div>
+
+      <!-- FS5→FS7→FS8 演進表 -->
+      <table class="compare-table">
+        <tr>
+          <th>面向</th>
+          <th>福衛五號 / 七號 (基礎)</th>
+          <th>福衛八號 (升級重點)</th>
+        </tr>
+        <tr>
+          <td>指令類型</td>
+          <td>TTQ、MPQ</td>
+          <td>TTQ、MPQ、<span class="hl">GEO Command（新增）</span></td>
+        </tr>
+        <tr>
+          <td>取像模式</td>
+          <td>標準影像取像</td>
+          <td><span class="hl">TDI 影像取像（新增）</span></td>
+        </tr>
+        <tr>
+          <td>資料下載</td>
+          <td>固定姿態下載</td>
+          <td><span class="hl">轉動衛星進行資料下載（新增）</span></td>
+        </tr>
+        <tr>
+          <td>瀏覽器相容</td>
+          <td>需限制 Chrome 版本</td>
+          <td><span class="ok">修正 Gantt Chart，不再限制 Chrome 版本</span></td>
+        </tr>
+        <tr>
+          <td>記憶體需求</td>
+          <td>N/A</td>
+          <td>建議 32GB 以上（系統無硬性限制）</td>
+        </tr>
+        <tr>
+          <td>已驗證衛星</td>
+          <td>FS5（遙測）、FS7（氣象）</td>
+          <td><span class="ok">以 FS5 為基礎，融入多年操作經驗優化</span></td>
+        </tr>
+      </table>
+
+    </div>
+  </div>
+
+
+  <!-- ════════════════════════════════════
+       CARD 5: 衛星與地面資源管理
+  ═════════════════════════════════════ -->
+  <div class="card">
+    <div class="card-head">
+      <div class="icon">⑤</div>
+      <div class="titles">
+        <h2>衛星與地面資源管理</h2>
+        <div class="en-title">Satellite &amp; Ground Resource Management</div>
+      </div>
+    </div>
+    <div class="card-body">
+
+      <!-- 三類資源 -->
+      <div class="res-grid">
+        <div class="res-card" style="--c:#003366;">
+          <div class="res-card-head">衛星資源 Satellite Resources</div>
+          <div class="res-card-body">
+            <ul>
+              <li><strong>記憶體 (SSR)</strong>：固態紀錄器容量配置與使用追蹤</li>
+              <li><strong>電力 (Power)</strong>：衛星電量消耗參數與 Duty Cycle 管理</li>
+              <li><strong>姿態限制</strong>：各活動之姿態操控時間與間距限制</li>
+              <li><strong>指令佇列</strong>：TTQ/MPQ/GEO 指令序列時序管理</li>
+            </ul>
+            <div style="margin-top:8px;">
+              <span style="font-size:10px;color:#003366;font-weight:bold;">DB Tables：</span><br>
+              <span class="db-tag">satellite</span>
+              <span class="db-tag">satelliteps</span>
+              <span class="db-tag">recorder</span>
+              <span class="db-tag">recorderps</span>
+              <span class="db-tag">dutycycle</span>
+            </div>
+          </div>
+        </div>
+        <div class="res-card" style="--c:#336699;">
+          <div class="res-card-head">地面站資源 Ground Station Resources</div>
+          <div class="res-card-body">
+            <ul>
+              <li><strong>S 頻段站</strong>（中壢/台南）：0° / 10° 仰角接觸視窗</li>
+              <li><strong>X 頻段站</strong>：11.5° 仰角接觸視窗（影像下載）</li>
+              <li><strong>維護週期</strong>：地面站不可用時段定義</li>
+              <li><strong>Turnaround Time</strong>：同站兩次接觸最小間隔</li>
+              <li><strong>Contact Bounds</strong>：接觸時間上下限設定</li>
+            </ul>
+            <div style="margin-top:8px;">
+              <span style="font-size:10px;color:#003366;font-weight:bold;">DB Tables：</span><br>
+              <span class="db-tag">site</span>
+              <span class="db-tag">siteps</span>
+              <span class="db-tag">contact</span>
+              <span class="db-tag">eclipse</span>
+              <span class="db-tag">rev</span>
+            </div>
+          </div>
+        </div>
+        <div class="res-card" style="--c:#006633;">
+          <div class="res-card-head">海外站資源 Remote Tracking Station</div>
+          <div class="res-card-body">
+            <ul>
+              <li><strong>X 頻段游牧式地面站</strong>：30° 仰角接觸視窗</li>
+              <li><strong>排程請求 (Request)</strong>：向 RTS 發送使用申請</li>
+              <li><strong>排程確認 (Confirm)</strong>：接收 RTS 可用性回覆</li>
+              <li><strong>格式規範</strong>：FS8-ICD-0003 (RTS ICD)</li>
+              <li><strong>VPN 連線</strong>：經中華電信 100Mbps 加密傳輸</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- 資源管理流程 -->
+      <div style="font-size:11px;font-weight:bold;color:#003366;margin-bottom:6px;">資源管理作業流程</div>
+      <div class="flow-row">
+        <div class="flow-step">1. 資源定義<br><small style="font-weight:normal;">Resource Config CSU</small></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step alt">2. 海外站申請<br><small style="font-weight:normal;">RTS Schedule Mgmt CSU</small></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step alt">3. 事件模板設定<br><small style="font-weight:normal;">RTCS Mgmt CSU</small></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step alt">4. 建立排程 Session<br><small style="font-weight:normal;">Session Manager CSU</small></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step end">5. 執行排程<br><small style="font-weight:normal;">Scheduling CSC</small></div>
+      </div>
+
+      <!-- RTCS 事件模板對應 -->
+      <div style="font-size:11px;font-weight:bold;color:#003366;margin:14px 0 6px;">RTCS 事件模板對應表（相對時序指令序列）</div>
+      <table class="act-table">
+        <tr>
+          <th style="width:140px;">活動類型</th>
+          <th style="width:200px;">Event Template 檔案</th>
+          <th>觸發來源</th>
+          <th>資源消耗</th>
+        </tr>
+        <tr>
+          <td>S-Band 接觸開始/結束</td>
+          <td class="etf">ACQ_S.etf / ACQ_E.etf</td>
+          <td>Contact Report (FDF)</td>
+          <td>S-Band 地面站、衛星發射機</td>
+        </tr>
+        <tr>
+          <td>科學酬載下載 PBK</td>
+          <td class="etf">Science_PLD_PBK.etf</td>
+          <td>Science Payload Timeline</td>
+          <td>X-Band 站、SSR、電力</td>
+        </tr>
+        <tr>
+          <td>RSI 取像</td>
+          <td class="etf">RSI_REC.etf</td>
+          <td>RSI Mission Timeline (IPS)</td>
+          <td>RSI 儀器、SSR 寫入、電力</td>
+        </tr>
+        <tr>
+          <td>RSI 資料下載</td>
+          <td class="etf">RSI_PBK.etf</td>
+          <td>排程規劃後自動產生</td>
+          <td>X-Band 站、SSR 讀取、電力</td>
+        </tr>
+        <tr>
+          <td>姿態機動</td>
+          <td class="etf">ATT_MAN.etf</td>
+          <td>手動排程 / 外部請求</td>
+          <td>推進燃料、姿控系統、電力</td>
+        </tr>
+        <tr>
+          <td>軌道機動</td>
+          <td class="etf">ORB_MAN.etf</td>
+          <td>FDF 軌道維持規劃</td>
+          <td>推進燃料、電力</td>
+        </tr>
+        <tr>
+          <td>Go Home 機動</td>
+          <td class="etf">GOHOME_MAN.etf</td>
+          <td>手動排程</td>
+          <td>姿控系統、電力</td>
+        </tr>
+        <tr>
+          <td>SSR 資料刪除</td>
+          <td class="etf">SSR_DEL.etf</td>
+          <td>排程後自動產生</td>
+          <td>SSR（釋放空間）</td>
+        </tr>
+        <tr>
+          <td>指令程序 / 健康監測</td>
+          <td class="etf">RTCMD / MISC / Science_Pld_PROC</td>
+          <td>冷排程自動產生</td>
+          <td>S-Band 站、衛星電力</td>
+        </tr>
+      </table>
+
+      <!-- 資源報告 -->
+      <div style="display:flex;gap:10px;margin-top:12px;">
+        <div style="flex:1;background:#e8eef5;border-left:4px solid #003366;padding:10px 14px;font-size:11px;">
+          <strong style="color:#003366;">衛星資源使用率報告</strong><br>
+          Duty Cycle Report、SSR 使用狀況報告，協助操作人員掌握衛星剩餘資源，做為下一 Session 排程的決策依據。
+        </div>
+        <div style="flex:1;background:#e8f0e8;border-left:4px solid #006633;padding:10px 14px;font-size:11px;">
+          <strong style="color:#006633;">資料庫同步備援</strong><br>
+          Primary/Backup 雙主機每日自動同步 PostgreSQL 資料庫，確保記憶體參數、電力參數、所有活動紀錄與軌道事件均有完整備份。
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════
+       CARD 6: 衛星活動類型與限制條件
+  ═════════════════════════════════════ -->
+  <div class="card">
+    <div class="card-head">
+      <div class="icon">⑥</div>
+      <div class="titles">
+        <h2>衛星活動類型與限制條件</h2>
+        <div class="en-title">Satellite Activity Types &amp; Scheduling Constraints</div>
+      </div>
+    </div>
+    <div class="card-body">
+
+      <!-- 活動類型表 -->
+      <div style="font-size:11px;font-weight:bold;color:#003366;margin-bottom:8px;">FS8 衛星活動類型（8 種）</div>
+      <table class="act-table">
+        <tr>
+          <th style="width:24px;">#</th>
+          <th style="width:110px;">活動類型</th>
+          <th style="width:160px;">英文名稱</th>
+          <th>來源</th>
+          <th>說明</th>
+        </tr>
+        <tr>
+          <td style="text-align:center;"><span class="act-badge" style="background:#003366;">1</span></td>
+          <td><strong>RSI 取像</strong></td>
+          <td class="etf">RSI Record</td>
+          <td>IPS-PSS Mission Timeline</td>
+          <td>遙測影像感測器 (RSI) 對地取像，佔用 SSR 記憶體與電力，需在 RFPA 視窗內排程</td>
+        </tr>
+        <tr>
+          <td style="text-align:center;"><span class="act-badge" style="background:#003366;">2</span></td>
+          <td><strong>RSI 下載</strong></td>
+          <td class="etf">RSI Playback</td>
+          <td>排程系統自動產生</td>
+          <td>將 SSR 中的 RSI 影像透過 X-Band 站下傳，與 RSI Record 不得重疊</td>
+        </tr>
+        <tr>
+          <td style="text-align:center;"><span class="act-badge" style="background:#336699;">3</span></td>
+          <td><strong>姿態機動</strong></td>
+          <td class="etf">Attitude Maneuver</td>
+          <td>手動排程 / 外部請求</td>
+          <td>FS8 新增：轉動衛星以最佳化取像角度或配合下載活動；受 Latitude Time / Maneuver Interval 限制</td>
+        </tr>
+        <tr>
+          <td style="text-align:center;"><span class="act-badge" style="background:#336699;">4</span></td>
+          <td><strong>軌道機動</strong></td>
+          <td class="etf">Orbit Maneuver</td>
+          <td>FDF 軌道規劃</td>
+          <td>軌道維持或轉換，消耗推進燃料，需與其他活動保持安全間隔</td>
+        </tr>
+        <tr>
+          <td style="text-align:center;"><span class="act-badge" style="background:#336699;">5</span></td>
+          <td><strong>Go Home 機動</strong></td>
+          <td class="etf">Go Home Maneuver</td>
+          <td>手動排程</td>
+          <td>衛星回歸標準姿態，受 Latitude Time Go Maneuver 限制</td>
+        </tr>
+        <tr>
+          <td style="text-align:center;"><span class="act-badge" style="background:#555;">6</span></td>
+          <td><strong>指令程序</strong></td>
+          <td class="etf">Misc Cmd Procedure</td>
+          <td>手動 / 冷排程</td>
+          <td>例行維護指令序列、特殊操作程序，格式為 RTCMD 或 MISC 指令封包</td>
+        </tr>
+        <tr>
+          <td style="text-align:center;"><span class="act-badge" style="background:#555;">7</span></td>
+          <td><strong>SSR 刪除</strong></td>
+          <td class="etf">SSR Delete</td>
+          <td>排程後自動產生</td>
+          <td>清除 SSR 已下傳資料以釋放記憶體空間，供後續取像活動使用</td>
+        </tr>
+        <tr>
+          <td style="text-align:center;"><span class="act-badge" style="background:#555;">8</span></td>
+          <td><strong>健康狀態觀測</strong></td>
+          <td class="etf">Monitor</td>
+          <td>Cold Scheduler 自動產生</td>
+          <td>每個 Session 自動排入，透過 S-Band 站接觸期間監視衛星健康狀態</td>
+        </tr>
+      </table>
+
+      <!-- 排程限制條件 -->
+      <div style="font-size:11px;font-weight:bold;color:#003366;margin:18px 0 8px;">
+        Scheduler Validation — 10 項排程限制條件
+        <span style="font-size:10px;font-weight:normal;color:#555;margin-left:8px;">（任一違反則排程驗證失敗，需調整後重新驗證）</span>
+      </div>
+      <div class="rule-grid">
+        <div class="rule-item" style="--c:#cc3300;">
+          <div class="rule-num">R1</div>
+          <div class="rule-body">
+            <div class="rule-title">RSI cannot overlap PBK</div>
+            <div class="rule-desc">RSI 取像活動與任何 Playback（影像下載）活動不得在時間上重疊，防止 SSR 同時讀寫衝突。</div>
+          </div>
+        </div>
+        <div class="rule-item" style="--c:#cc3300;">
+          <div class="rule-num">R2</div>
+          <div class="rule-body">
+            <div class="rule-title">Site Turnaround Time</div>
+            <div class="rule-desc">同一地面站兩次連續接觸之間，必須保留最小間隔時間（Turnaround），避免天線設備來不及重置。</div>
+          </div>
+        </div>
+        <div class="rule-item" style="--c:#336699;">
+          <div class="rule-num">R3</div>
+          <div class="rule-body">
+            <div class="rule-title">Antenna Unavailable for Time Range</div>
+            <div class="rule-desc">當地面站標記為維護或不可用時，排程系統不得在該時段安排任何接觸活動。</div>
+          </div>
+        </div>
+        <div class="rule-item" style="--c:#336699;">
+          <div class="rule-num">R4</div>
+          <div class="rule-body">
+            <div class="rule-title">Contact Bounds</div>
+            <div class="rule-desc">接觸活動必須排在地面站的可視仰角時窗內（S-Band 0°/10°、X-Band 11.5°、RTS 30°），超出邊界則無效。</div>
+          </div>
+        </div>
+        <div class="rule-item" style="--c:#006633;">
+          <div class="rule-num">R5</div>
+          <div class="rule-body">
+            <div class="rule-title">Duty Cycle</div>
+            <div class="rule-desc">RSI 取像或其他高耗能活動在特定軌道圈次內的總工作比例，不得超過衛星電力預算所允許的 Duty Cycle 上限。</div>
+          </div>
+        </div>
+        <div class="rule-item" style="--c:#006633;">
+          <div class="rule-num">R6</div>
+          <div class="rule-body">
+            <div class="rule-title">Rec RSI Capacity</div>
+            <div class="rule-desc">RSI 取像累積資料量不得超過 SSR 剩餘可用容量，防止固態紀錄器溢出導致資料遺失。</div>
+          </div>
+        </div>
+        <div class="rule-item" style="--c:#553399;">
+          <div class="rule-num">R7</div>
+          <div class="rule-body">
+            <div class="rule-title">Latitude Time Maneuver</div>
+            <div class="rule-desc">衛星轉動（Attitude Maneuver）只能在特定緯度時間範圍內執行，避免機動期間通過特定地區影響操控。</div>
+          </div>
+        </div>
+        <div class="rule-item" style="--c:#553399;">
+          <div class="rule-num">R8</div>
+          <div class="rule-body">
+            <div class="rule-title">Latitude Time Go Maneuver</div>
+            <div class="rule-desc">Go Home 機動（回歸標準姿態）同樣受緯度時間限制，必須在允許的緯度帶內完成機動動作。</div>
+          </div>
+        </div>
+        <div class="rule-item" style="--c:#cc6600;">
+          <div class="rule-num">R9</div>
+          <div class="rule-body">
+            <div class="rule-title">Maneuver Interval</div>
+            <div class="rule-desc">兩次姿態或軌道機動之間必須保持最小時間間隔，確保衛星姿控系統有足夠時間穩定。</div>
+          </div>
+        </div>
+        <div class="rule-item" style="--c:#cc6600;">
+          <div class="rule-num">R10</div>
+          <div class="rule-body">
+            <div class="rule-title">RSI Record FPA Window</div>
+            <div class="rule-desc">RSI 取像活動必須排在 FPA 時窗內，FPA 開機需等待 25 秒，關機需等待 8 秒，超出保護視窗外的排程將被驗證拒絕。</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 排程衝突處理流程 -->
+      <div style="font-size:11px;font-weight:bold;color:#003366;margin:14px 0 6px;">排程驗證流程</div>
+      <div class="flow-row">
+        <div class="flow-step alt">建立 Session<br><small>Session Manager</small></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">冷排程<br><small>Cold Scheduler</small></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step alt">外部活動匯入<br><small>RSI / SPL Timeline</small></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step alt">Gantt 手動調整<br><small>Gantt Chart CSU</small></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step alt">規則驗證<br><small>Validation (R1–R10)</small></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step end" style="background:#006633;">指令集產生<br><small>Product Generation</small></div>
+      </div>
+      <div style="font-size:10px;color:#888;margin-top:4px;">
+        ※ 驗證若失敗，系統顯示違規原因，操作人員須回到 Gantt Chart 調整後重新驗證，直至所有 10 項規則均通過為止。
+      </div>
+
+    </div>
+  </div>
+
+</div><!-- /wrap -->
+
+<div class="footer">
+  <span>FS8-TASA-RPT-0095 · FORMOSAT-8 SOC System Design Document</span>
+  <span>Taiwan Space Agency (TASA) · 國家太空中心 · 2019/12/02</span>
+</div>
+
+</body>
+</html>
