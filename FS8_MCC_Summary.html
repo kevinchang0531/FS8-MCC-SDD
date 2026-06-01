@@ -1189,6 +1189,243 @@ body {
     </div>
   </div>
 
+
+  <!-- ════════════════════════════════════
+       CARD 7: 近即時排程系統規劃
+  ═════════════════════════════════════ -->
+  <div class="card">
+    <div class="card-head">
+      <div class="icon">⑦</div>
+      <div class="titles">
+        <h2>近即時遙測取像與資料下鏈排程系統規劃</h2>
+        <div class="en-title">Near Real-Time Imaging &amp; Downlink Scheduling System — Concept Design</div>
+      </div>
+    </div>
+    <div class="card-body">
+
+      <!-- 目標摘要 -->
+      <div style="background:#f0f4f8;border-left:4px solid #003366;padding:12px 16px;margin-bottom:16px;font-size:12px;line-height:1.7;">
+        建立一套高度整合 <strong>IPS–SOCS–衛星–地面站–XDS</strong> 的端對端排程系統，第一期採 <strong style="color:#cc3300;">人審後上傳</strong> 模式：系統每輪自動產生取像與下鏈整合排程、MPQ/TTQ 與操作指令建議，操作員核准後送入 SOCS/地面站流程。
+      </div>
+
+      <!-- 核心目標 -->
+      <div style="font-size:11px;font-weight:bold;color:#003366;margin-bottom:8px;">核心目標</div>
+      <div class="rule-grid" style="margin-bottom:16px;">
+        <div class="rule-item" style="--c:#003366;">
+          <div class="rule-num">①</div>
+          <div class="rule-body">
+            <div class="rule-title">可調式排程週期</div>
+            <div class="rule-desc">最快可達 ≤ 1 小時一輪排程更新。</div>
+          </div>
+        </div>
+        <div class="rule-item" style="--c:#336699;">
+          <div class="rule-num">②</div>
+          <div class="rule-body">
+            <div class="rule-title">近即時氣象整合</div>
+            <div class="rule-desc">每輪排程前使用最後更新時間 ≤ 1 小時的全球氣象資料。</div>
+          </div>
+        </div>
+        <div class="rule-item" style="--c:#006633;">
+          <div class="rule-num">③</div>
+          <div class="rule-body">
+            <div class="rule-title">端對端整合排程</div>
+            <div class="rule-desc">每輪產出涵蓋 拍攝目標 / TT&amp;C 地面站 / 衛星 / SSR / XDS / 地面接收站 的整合排程。</div>
+          </div>
+        </div>
+        <div class="rule-item" style="--c:#cc3300;">
+          <div class="rule-num">④</div>
+          <div class="rule-body">
+            <div class="rule-title">每軌取像能力目標</div>
+            <div class="rule-desc">每軌最多 10 個取像目標、每日最多約 150 點；實際以 agility / power / memory / downlink 約束為準。</div>
+          </div>
+        </div>
+        <div class="rule-item" style="--c:#553399;">
+          <div class="rule-num">⑤</div>
+          <div class="rule-body">
+            <div class="rule-title">局部重排機制</div>
+            <div class="rule-desc">地面站資源異動時可局部重排，避免整批計畫失效。</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 7 大子系統 -->
+      <div style="font-size:11px;font-weight:bold;color:#003366;margin-bottom:8px;">7 大子系統架構</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;">
+
+        <div class="func-card" style="--c:#003366;">
+          <div class="fc-num">Subsystem 1</div>
+          <div class="fc-title">任務需求與 IPS 介接</div>
+          <ul>
+            <li>接收 AOI、優先級、deadline、解析度/感測器模式、雲量門檻、交付 SLA</li>
+            <li>每筆任務維護完整狀態：待排程 → 已排 → 已執行 → 已交付</li>
+            <li>保留不可行原因（雲量過高、無可視窗口、SSR 不足等）</li>
+          </ul>
+        </div>
+
+        <div class="func-card" style="--c:#336699;">
+          <div class="fc-num">Subsystem 2</div>
+          <div class="fc-title">近即時氣象與可取像窗口</div>
+          <ul>
+            <li>每輪確認氣象資料更新時間 ≤ 1 小時</li>
+            <li>對每個 AOI 產生候選窗口：雲量、太陽高度角、入射角、姿態角、模式切換時間</li>
+            <li>氣象逾期須標示 degraded mode，不可靜默排程</li>
+          </ul>
+        </div>
+
+        <div class="func-card" style="--c:#006633;">
+          <div class="fc-num">Subsystem 3</div>
+          <div class="fc-title">衛星與星上資源模型</div>
+          <ul>
+            <li>維護 orbit、attitude slew、power、thermal、payload mode、SSR、health</li>
+            <li>每個候選任務估算：取像時間、姿態成本、電力成本、資料量、最早可下鏈時間</li>
+            <li>第一版採保守約束排程</li>
+          </ul>
+        </div>
+
+        <div class="func-card" style="--c:#cc3300;">
+          <div class="fc-num">Subsystem 4</div>
+          <div class="fc-title">TT&amp;C 與地面站動態資源</div>
+          <ul>
+            <li>維護 TT&amp;C 站、接收站、XDS、天線、頻段、通聯窗口、維護封鎖</li>
+            <li>檢查 MPQ/TTQ 能否在執行前上傳；影像能否在 deadline 前下鏈</li>
+            <li>故障時只重排受影響衛星與時間窗，避免全星系全日重算</li>
+          </ul>
+        </div>
+
+        <div class="func-card" style="--c:#553399;">
+          <div class="fc-num">Subsystem 5</div>
+          <div class="fc-title">整合排程引擎</div>
+          <ul>
+            <li>固定優先序：安全 &gt; 指令可上傳 &gt; 高優先 &gt; deadline &gt; SSR 不溢位 &gt; 地面站利用率 &gt; 取像最大化</li>
+            <li>第一版：規則式可行性 + 啟發式排序 + 局部重排；後續導入 OR-Tools CP-SAT / MILP</li>
+            <li>每輪輸出：推薦排程、被拒任務與原因、替代方案</li>
+          </ul>
+        </div>
+
+        <div class="func-card" style="--c:#cc6600;">
+          <div class="fc-num">Subsystem 6</div>
+          <div class="fc-title">MPQ/TTQ 與 SOCS 操作封裝</div>
+          <ul>
+            <li>產出 SOCS 可接收的操作包：取像 timeline、TT&amp;C upload window、SSR 計畫、XDS downlink plan、風險標記</li>
+            <li>第一版不直接自動上傳衛星，必須經操作員核准</li>
+            <li>每個操作包需有版本號、氣象資料時間、軌道資料版本、核准者、送出時間</li>
+          </ul>
+        </div>
+
+      </div>
+
+      <!-- Subsystem 7 獨立一欄 -->
+      <div class="func-card" style="--c:#006666;margin-bottom:16px;">
+        <div class="fc-num">Subsystem 7</div>
+        <div class="fc-title">操作員工作台</div>
+        <ul>
+          <li>主畫面顯示星系時間軸：衛星軌道、取像任務、TT&amp;C pass、XDS/downlink pass、SSR 水位</li>
+          <li>可人工鎖定任務、排除地面站、調整優先級、接受替代方案、核准或退回排程</li>
+          <li>系統必須能解釋每個決策：為何排入、為何延後、為何被擠出</li>
+        </ul>
+      </div>
+
+      <!-- 資料介面 -->
+      <div style="font-size:11px;font-weight:bold;color:#003366;margin-bottom:8px;">關鍵資料介面 (Data Contracts)</div>
+      <table class="act-table" style="margin-bottom:16px;">
+        <tr>
+          <th style="width:180px;">介面名稱</th>
+          <th>主要欄位</th>
+        </tr>
+        <tr>
+          <td><strong>MissionRequest</strong></td>
+          <td class="etf">mission_id, AOI, priority, deadline, cloud_threshold, sensor_mode, required_resolution, delivery_sla, requester, security_tag</td>
+        </tr>
+        <tr>
+          <td><strong>WeatherSnapshot</strong></td>
+          <td class="etf">source, update_time, AOI_cloud_score, confidence, valid_until</td>
+        </tr>
+        <tr>
+          <td><strong>SatelliteState</strong></td>
+          <td class="etf">satellite_id, orbit_version, health, power_margin, SSR_free, payload_status, maneuver_limits</td>
+        </tr>
+        <tr>
+          <td><strong>GroundResourceWindow</strong></td>
+          <td class="etf">station_id, type(TT&amp;C/XDS/receiver), satellite_id, AOS, LOS, data_rate, command_upload_allowed, maintenance_lock</td>
+        </tr>
+        <tr>
+          <td><strong>SchedulePlan</strong></td>
+          <td class="etf">plan_id, cycle_time, weather_time, satellite_id, imaging_tasks, TTQ_upload_plan, SSR_file_plan, downlink_plan, risk_flags</td>
+        </tr>
+        <tr>
+          <td><strong>SOCSPackage</strong></td>
+          <td class="etf">plan_id, satellite_id, MPQ, TTQ, command_timeline, validation_report, approval_status</td>
+        </tr>
+      </table>
+      <div style="font-size:10px;color:#888;margin-top:-10px;margin-bottom:16px;">※ 所有介面支援 dry-run 與正式版兩種模式；正式版送 SOCS 前必須通過 validation report。</div>
+
+      <!-- 驗收測試 -->
+      <div style="font-size:11px;font-weight:bold;color:#003366;margin-bottom:8px;">驗收測試情境</div>
+      <div class="rule-grid">
+        <div class="rule-item" style="--c:#006633;">
+          <div class="rule-num">T1</div>
+          <div class="rule-body">
+            <div class="rule-title">基本閉環</div>
+            <div class="rule-desc">輸入 AOI 後，系統產生取像時間、TT&amp;C 上傳窗口、SSR 配置、XDS 下鏈窗口、預估交付時間。</div>
+          </div>
+        </div>
+        <div class="rule-item" style="--c:#006633;">
+          <div class="rule-num">T2</div>
+          <div class="rule-body">
+            <div class="rule-title">氣象有效性</div>
+            <div class="rule-desc">氣象資料超過 1 小時未更新，排程標示 degraded mode 並阻擋自動核准。</div>
+          </div>
+        </div>
+        <div class="rule-item" style="--c:#336699;">
+          <div class="rule-num">T3</div>
+          <div class="rule-body">
+            <div class="rule-title">每軌重排</div>
+            <div class="rule-desc">新增高優先任務後，系統在下一輪排程中局部重排同軌任務。</div>
+          </div>
+        </div>
+        <div class="rule-item" style="--c:#336699;">
+          <div class="rule-num">T4</div>
+          <div class="rule-body">
+            <div class="rule-title">SSR 壓力</div>
+            <div class="rule-desc">模擬連續取像但下鏈不足，系統必須避免 SSR 溢位並說明被拒任務。</div>
+          </div>
+        </div>
+        <div class="rule-item" style="--c:#cc3300;">
+          <div class="rule-num">T5</div>
+          <div class="rule-body">
+            <div class="rule-title">地面站故障</div>
+            <div class="rule-desc">移除一個 TT&amp;C 或 XDS pass，系統改用替代地面站或標示不可行。</div>
+          </div>
+        </div>
+        <div class="rule-item" style="--c:#cc3300;">
+          <div class="rule-num">T6</div>
+          <div class="rule-body">
+            <div class="rule-title">人工核准</div>
+            <div class="rule-desc">未核准的 MPQ/TTQ 不可送入 SOCS；核准後版本不可被靜默覆蓋。</div>
+          </div>
+        </div>
+        <div class="rule-item" style="--c:#553399;">
+          <div class="rule-num">T7</div>
+          <div class="rule-body">
+            <div class="rule-title">效能測試</div>
+            <div class="rule-desc">全星系 24 小時任務池，單輪排程計算時間需 &lt; 設定週期的 20%。</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 假設與限制 -->
+      <div style="margin-top:14px;padding:10px 14px;background:#fff8f0;border-left:4px solid #cc6600;font-size:11px;line-height:1.7;">
+        <strong style="color:#cc6600;">假設與範圍限制</strong><br>
+        • 第一版交付物為「系統設計書」等級，不直接實作。<br>
+        • 第一版採「人審後上傳」，非全自動飛行操作。<br>
+        • 範圍涵蓋取像與下鏈整合排程，不只做取像排程。<br>
+        • IPS/SOCS/XDS/MPQ/TTQ 實際檔案格式與 API 尚未提供，以抽象資料契約描述；實作前需補齊既有系統 ICD。<br>
+        • 每軌 10 點、每日 150 點視為目標能力，不作為硬性保證；實際排程以衛星設計與即時狀態為準。
+      </div>
+
+    </div>
+  </div>
+
 </div><!-- /wrap -->
 
 <div class="footer">
