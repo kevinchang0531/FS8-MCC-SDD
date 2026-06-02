@@ -594,7 +594,7 @@ body {
             </div>
           </div>
           <div class="ifc-row">
-            <div class="ifc-peer">DCC</div>
+            <div class="ifc-peer">SPL</div>
             <div class="ifc-data">
               <span class="ifc-tag t-in">內部</span>
               Science Payload Mission Timeline<br>
@@ -633,7 +633,7 @@ body {
             </div>
           </div>
           <div class="ifc-row">
-            <div class="ifc-peer">DCC / 操作人員</div>
+            <div class="ifc-peer">DCC / 審查人員</div>
             <div class="ifc-data">
               <span class="ifc-tag t-in">內部</span>
               ASR（Acquisition Schedule Report）<br>
@@ -774,7 +774,7 @@ body {
         <div class="tech-card" style="--c:#336699;">
           <div class="tc-title">Web-Based 操控</div>
           <div class="tc-body">
-            使用者介面以 <strong>HTML + JavaScript</strong> 實作，操作人員可透過<strong>任何瀏覽器</strong>、任何具安全認證網路的 PC、NB 或手持裝置存取 MPSS，不侷限於 SOCC 內部。
+            使用者介面以 <strong>HTML + JavaScript</strong> 實作，審查人員可透過<strong>任何瀏覽器</strong>、任何具安全認證網路的 PC、NB 或手持裝置存取 MPSS，不侷限於 SOCC 內部。
           </div>
         </div>
         <div class="tech-card" style="--c:#006633;">
@@ -886,6 +886,7 @@ body {
             <ul>
               <li><strong>S 頻段站</strong>（中壢/台南）：0° / 10° 仰角接觸視窗</li>
               <li><strong>X 頻段站</strong>：11.5° 仰角接觸視窗（影像下載）</li>
+              <li><strong>X 頻段游牧式地面站</strong>：11.5° 仰角接觸視窗</li>
               <li><strong>維護週期</strong>：地面站不可用時段定義</li>
               <li><strong>Turnaround Time</strong>：同站兩次接觸最小間隔</li>
               <li><strong>Contact Bounds</strong>：接觸時間上下限設定</li>
@@ -904,7 +905,6 @@ body {
           <div class="res-card-head">海外站資源 Remote Tracking Station</div>
           <div class="res-card-body">
             <ul>
-              <li><strong>X 頻段游牧式地面站</strong>：30° 仰角接觸視窗</li>
               <li><strong>排程請求 (Request)</strong>：向 RTS 發送使用申請</li>
               <li><strong>排程確認 (Confirm)</strong>：接收 RTS 可用性回覆</li>
               <li><strong>格式規範</strong>：FS8-ICD-0003 (RTS ICD)</li>
@@ -945,9 +945,9 @@ body {
         </tr>
         <tr>
           <td>科學酬載下載 PBK</td>
-          <td class="etf">Science_PLD_PBK.etf</td>
+          <td class="etf">SPL_PBK.etf</td>
           <td>Science Payload Timeline</td>
-          <td>X-Band 站、SSR、電力</td>
+          <td>S-Band 站、SSR、電力</td>
         </tr>
         <tr>
           <td>RSI 取像</td>
@@ -965,7 +965,7 @@ body {
           <td>姿態機動</td>
           <td class="etf">ATT_MAN.etf</td>
           <td>手動排程 / 外部請求</td>
-          <td>推進燃料、姿控系統、電力</td>
+          <td>姿控系統、電力</td>
         </tr>
         <tr>
           <td>軌道機動</td>
@@ -997,7 +997,7 @@ body {
       <div style="display:flex;gap:10px;margin-top:12px;">
         <div style="flex:1;background:#e8eef5;border-left:4px solid #003366;padding:10px 14px;font-size:11px;">
           <strong style="color:#003366;">衛星資源使用率報告</strong><br>
-          Duty Cycle Report、SSR 使用狀況報告，協助操作人員掌握衛星剩餘資源，做為下一 Session 排程的決策依據。
+          Duty Cycle Report、SSR 使用狀況報告，協助審查人員掌握衛星剩餘資源，做為下一 Session 排程的決策依據。
         </div>
         <div style="flex:1;background:#e8f0e8;border-left:4px solid #006633;padding:10px 14px;font-size:11px;">
           <strong style="color:#006633;">資料庫同步備援</strong><br>
@@ -1120,7 +1120,7 @@ body {
           <div class="rule-num">R4</div>
           <div class="rule-body">
             <div class="rule-title">Contact Bounds</div>
-            <div class="rule-desc">接觸活動必須排在地面站的可視仰角時窗內（S-Band 0°/10°、X-Band 11.5°、RTS 30°），超出邊界則無效。</div>
+            <div class="rule-desc">接觸活動必須排在地面站的可視仰角時窗內（S-Band 0°/10°、X-Band 11.5°），超出邊界則無效。</div>
           </div>
         </div>
         <div class="rule-item" style="--c:#006633;">
@@ -1183,7 +1183,7 @@ body {
         <div class="flow-step end" style="background:#006633;">指令集產生<br><small>Product Generation</small></div>
       </div>
       <div style="font-size:10px;color:#888;margin-top:4px;">
-        ※ 驗證若失敗，系統顯示違規原因，操作人員須回到 Gantt Chart 調整後重新驗證，直至所有 10 項規則均通過為止。
+        ※ 驗證若失敗，系統顯示違規原因，審查人員須回到 Gantt Chart 調整後重新驗證，直至所有 10 項規則均通過為止。
       </div>
 
     </div>
@@ -1317,7 +1317,7 @@ body {
       <!-- Subsystem 7 獨立一欄 -->
       <div class="func-card" style="--c:#006666;margin-bottom:16px;">
         <div class="fc-num">Subsystem 7</div>
-        <div class="fc-title">操作員工作台</div>
+        <div class="fc-title">審查人員(MA)工作台</div>
         <ul>
           <li>主畫面顯示星系時間軸：衛星軌道、取像任務、TT&amp;C pass、XDS/downlink pass、SSR 水位</li>
           <li>可人工鎖定任務、排除地面站、調整優先級、接受替代方案、核准或退回排程</li>
@@ -1538,6 +1538,7 @@ body {
         <strong style="color:#003366;">參考資源</strong>&nbsp;
         ·&nbsp;<a href="https://kevinchang0531.github.io/TASA-mission-scheduling/" style="color:#336699;text-decoration:none;">FS8A 衛星活動類型及核心限制條件</a>
         &nbsp;·&nbsp;<a href="https://kevinchang0531.github.io/satellite-scheduler-guide/" style="color:#336699;text-decoration:none;">遙測衛星近即時排程系統開發前規劃</a>
+        &nbsp;·&nbsp;<a href="https://kevinchang0531.github.io/TASA-mission-scheduling/FS8A_activity_timeline_zoom.html" style="color:#336699;text-decoration:none;">FS8A 衛星活動分布</a>
       </div>
 
     </div>
